@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bgu.spl171.net.api.bidi;
+package bgu.spl171.net.api;
 
 /**
  *

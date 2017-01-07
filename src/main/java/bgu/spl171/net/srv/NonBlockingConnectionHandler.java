@@ -2,6 +2,8 @@ package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.MessageEncoderDecoder;
 import bgu.spl171.net.api.MessagingProtocol;
+import com.sun.xml.internal.bind.v2.TODO;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
@@ -21,6 +23,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private final Queue<ByteBuffer> writeQueue = new LinkedList<>();
     private final SocketChannel chan;
     private final Reactor reactor;
+    //id?
 
     public NonBlockingConnectionHandler(
             MessageEncoderDecoder<T> reader,
@@ -118,4 +121,8 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         BUFFER_POOL.add(buff);
     }
 
+    @Override
+    public void send(T msg) {
+        //TODO
+    }
 }
