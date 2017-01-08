@@ -1,7 +1,7 @@
 package bgu.spl171.net.impl;
 
 import bgu.spl171.net.api.MessageEncoderDecoder;
-import bgu.spl171.net.packets.RRQ;
+import bgu.spl171.net.packets.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -15,7 +15,8 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
     private int len = 0;
     short OPcode=0;
     boolean hasOPcode=false;
-
+    String ans;
+    //for Data use
     boolean issize=false;
     int size=0;
     boolean hasBlock=false;
@@ -38,8 +39,9 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
                 break;
 
             case 1:
+                RRQ tmp1 = new RRQ();
                 if (nextByte==0){
-                    Read(popString());
+                    ans=tmp1.read(popString());
                 }
                 else
                     pushByte(nextByte);
@@ -47,8 +49,9 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
                 break;
 
             case 2:
+                WRQ tmp2 = new WRQ();
                 if (nextByte==0){
-                    Write(popString());
+                    ans=tmp2.write(popString());
                 }
                 else
                     pushByte(nextByte);
@@ -67,7 +70,8 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
                     dataBlock=Integer.parseInt(popString());
                 }
                 if (len==size) {
-                    Data(Arrays.copyOfRange(bytes, 0, len - 1), size, dataBlock);
+                    DATA tmp3 = new DATA();
+                    ans=tmp3.Data(Arrays.copyOfRange(bytes, 0, len - 1), size, dataBlock);
                     OPcode = 0;
                     size = 0;
                     hasOPcode = false;
@@ -77,18 +81,14 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
                 }
                     break;
 
-            case 4:
-                break;
-
-            case 5:
-                //error - only to client
-
             case 6:
-                Dirq();
+                DIR tmp6 = new DIR();
+                ans=tmp6.Dirq();
 
             case 7:
+                LOGRQ tmp7 = new LOGRQ();
                 if (nextByte==0){
-                    LOGRQ(popString());
+                    ans=tmp7.LOGRQ(popString());
                 }
                 else
                     pushByte(nextByte);
@@ -96,22 +96,26 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
             break;
 
             case 8:
+                DELRQ tmp8 = new DELRQ();
                 if (nextByte==0){
-                    DELRQ(popString());
+                    ans=tmp8.DelRq(popString());
                 }
                 else
                     pushByte(nextByte);
                 return null;
             break;
 
-            case 9:
-            //SERVER TO CLIENT ONLY
 
             case 10:
                 Dis();
 
 
         }
+
+        if (OPcode!=(0|1|2|3|6|7|8|10)){
+        String ans = ERROR.getError(4,"");
+        }
+
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
 
