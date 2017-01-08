@@ -12,7 +12,7 @@ public class DELRQ implements Message {
             for (String file: files)
                 if(file.equals(filename)) {
                     files.remove(file);
-                   return getOpCode() + " " + filename;
+                    return ACK.checkACK(0,false);
             }
         }
             return ERROR.getError(3,"");

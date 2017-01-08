@@ -15,7 +15,7 @@ public class LOGRQ implements Message {
         if (!users.contains(username)) {
             users.add(username);
             this.username = username;
-       return this.getOpCode() +  " " + username;
+          return ACK.checkACK(0,false);
         }
         else
         return ERROR.getError(7,"");
