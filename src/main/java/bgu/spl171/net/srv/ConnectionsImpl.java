@@ -1,4 +1,4 @@
-package bgu.spl171.net.impl;
+package bgu.spl171.net.srv;
 
 import bgu.spl171.net.srv.ConnectionHandler;
 import java.io.IOException;

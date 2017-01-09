@@ -27,7 +27,7 @@ public class Reactor<T> implements Server<T> {
     public Reactor(
             int numThreads,
             int port,
-            Supplier<MessagingProtocol<T>> protocolFactory,
+            Supplier<BidiMessagingProtocol<T>> protocolFactory,
             Supplier<MessageEncoderDecoder<T>> readerFactory) {
 
         this.pool = new ActorThreadPool(numThreads);

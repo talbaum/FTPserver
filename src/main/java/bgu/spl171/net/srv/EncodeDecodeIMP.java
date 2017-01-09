@@ -1,4 +1,4 @@
-package bgu.spl171.net.impl;
+package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.MessageEncoderDecoder;
 import bgu.spl171.net.packets.*;
@@ -140,9 +140,10 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
                     DISC d = new DISC();
                     if (nextByte == 0) {
                         ans = d.disconnect(username);
-                        if (ans.equals("ACK 0"))
+                        if (ans.equals("ACK 0")) {
                             isLogged = false;
-
+                            username="";
+                        }
                         return encode(ans);
                     } else {
                         pushByte(nextByte);

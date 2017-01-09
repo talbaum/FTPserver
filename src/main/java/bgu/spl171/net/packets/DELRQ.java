@@ -15,7 +15,7 @@ public class DELRQ implements Message {
                     return ACK.checkACK(0,false);
             }
         }
-            return ERROR.getError(3,"");
+            return ERROR.getError(1,"");
     }
 
     @Override
