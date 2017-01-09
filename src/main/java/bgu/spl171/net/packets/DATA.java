@@ -9,7 +9,6 @@ import bgu.spl171.net.api.Message;
 public class DATA implements Message{
 
     String allTheData="";
-
        public String Data(byte[] array, int size, int blockNum){
            //we need to keep the data at some way
            allTheData+=array.toString();
@@ -17,9 +16,9 @@ public class DATA implements Message{
         //here we should write the file to Files folder
            return ACK.checkACK(blockNum,true);
        }
-           else
-        return null;
-
+       else {
+           return ACK.checkACK(blockNum, true);
+       }
        }
 
     @Override

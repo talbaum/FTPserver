@@ -9,9 +9,14 @@ public class WRQ implements Message {
     //need to write the file itself to files directory?
 
    public String write(String filename){
-       files.add(filename);
-       return ACK.checkACK(0,false);
-   }
+      if(!files.contains(filename)) {
+          files.add(filename);
+          return ACK.checkACK(0, false);
+      }
+      else{
+          return ERROR.getError(5,"");
+      }
+      }
 
     @Override
     public short getOpCode() {

@@ -13,6 +13,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
 
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
+    boolean isLogged=false;
     short OPcode=0;
     boolean hasOPcode=false;
     String ans;
@@ -21,6 +22,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
     int size=0;
     boolean hasBlock=false;
     int dataBlock=0;
+    String username="";
 
     public short bytesToShort(byte[] byteArr)
     {
@@ -30,97 +32,136 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
     }
 
     @Override
-    public String decodeNextByte(byte nextByte) {
+    public byte[] decodeNextByte(byte nextByte) {
 
-        switch (OPcode){
+        switch (OPcode) {
             case 0:
                 pushByte(nextByte);
                 return null; //not a line yet
-                break;
 
             case 1:
-                RRQ tmp1 = new RRQ();
-                if (nextByte==0){
-                    ans=tmp1.read(popString());
-                }
-                else
-                    pushByte(nextByte);
-                return null;
-                break;
+                if (isLogged) {
+                    RRQ tmp1 = new RRQ();
+                    if (nextByte == 0) {
+                        ans = tmp1.read(popString());
+                        return encode(ans);
+                    } else
+                        pushByte(nextByte);
+                    return null;
+                } else
+                    return encode(ERROR.getError(6, ""));
 
             case 2:
-                WRQ tmp2 = new WRQ();
-                if (nextByte==0){
-                    ans=tmp2.write(popString());
-                }
-                else
-                    pushByte(nextByte);
-                return null;
-            break;
+                if (isLogged) {
+                    WRQ tmp2 = new WRQ();
+                    if (nextByte == 0) {
+                        ans = tmp2.write(popString());
+                        return encode(ans);
+                    } else
+                        pushByte(nextByte);
+                    return null;
+                } else
+                    return encode(ERROR.getError(6, ""));
 
             case 3:
-
-                pushByte(nextByte);
-                if (!issize & len==2){
-                    issize=true;
-                    size=Integer.parseInt(popString());
-                }
-                if (!hasBlock & len==2){
-                    hasBlock=true;
-                    dataBlock=Integer.parseInt(popString());
-                }
-                if (len==size) {
-                    DATA tmp3 = new DATA();
-                    ans=tmp3.Data(Arrays.copyOfRange(bytes, 0, len - 1), size, dataBlock);
-                    OPcode = 0;
-                    size = 0;
-                    hasOPcode = false;
-                    issize = false;
-                    hasBlock = false;
-                    dataBlock = 0;
-                }
-                    break;
+                if (isLogged) {
+                    pushByte(nextByte);
+                    if (!issize & len == 2) {
+                        issize = true;
+                        size = Integer.parseInt(popString());
+                    }
+                    if (!hasBlock & len == 2) {
+                        hasBlock = true;
+                        dataBlock = Integer.parseInt(popString());
+                    }
+                    if (len == size) {
+                        DATA tmp3 = new DATA();
+                        ans = tmp3.Data(Arrays.copyOfRange(bytes, 0, len - 1), size, dataBlock);
+                        OPcode = 0;
+                        size = 0;
+                        hasOPcode = false;
+                        issize = false;
+                        hasBlock = false;
+                        dataBlock = 0;
+                        return encode(ans);
+                    }
+                } else
+                    return encode(ERROR.getError(6, ""));
+                break;
 
             case 6:
-                DIR tmp6 = new DIR();
-                ans=tmp6.Dirq();
+                if (isLogged) {
+                    DIRQ tmp6 = new DIRQ();
+                    if (nextByte == 0) {
+                        ans = tmp6.dirq();
+                        return encode(ans);
+                    } else {
+                        pushByte(nextByte);
+                        return null;
+                    }
+                } else
+                    return encode(ERROR.getError(6, ""));
 
             case 7:
-                LOGRQ tmp7 = new LOGRQ();
-                if (nextByte==0){
-                    ans=tmp7.LOGRQ(popString());
-                }
-                else
-                    pushByte(nextByte);
-                return null;
-            break;
+                    LOGRQ tmp7 = new LOGRQ();
+                    if (nextByte == 0) {
+                        username = popString();
+                        ans = tmp7.LOGRQ(username);
+                        if (ans.equals("ACK 0"))
+                            isLogged = true;
+
+                        return encode(ans);
+                    } else
+                        pushByte(nextByte);
+                    return null;
 
             case 8:
-                DELRQ tmp8 = new DELRQ();
-                if (nextByte==0){
-                    ans=tmp8.DelRq(popString());
-                }
-                else
-                    pushByte(nextByte);
-                return null;
-            break;
+                if (isLogged) {
+                    DELRQ tmp8 = new DELRQ();
+                    if (nextByte == 0) {
+                        ans = tmp8.DelRq(popString());
+                        return encode(ans);
+                    } else {
+                        pushByte(nextByte);
+                        return null;
+                    }
+                } else
+                    return encode(ERROR.getError(6, ""));
 
+            case 9:
+                if (isLogged) {
+                    //1bcast
+                } else
+                    return encode(ERROR.getError(6, ""));
+                break;
 
             case 10:
-                Dis();
+                if (isLogged) {
+                    DISC d = new DISC();
+                    if (nextByte == 0) {
+                        ans = d.disconnect(username);
+                        if (ans.equals("ACK 0"))
+                            isLogged = false;
 
-
+                        return encode(ans);
+                    } else {
+                        pushByte(nextByte);
+                        return null;
+                    }
+                } else
+                    return encode(ERROR.getError(6, ""));
         }
 
         if (OPcode!=(0|1|2|3|6|7|8|10)){
         String ans = ERROR.getError(4,"");
+        return ans.getBytes();
         }
 
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
 
         if (nextByte == '\n') {
-            return popString();
+            return popString().getBytes();
         }
 
         pushByte(nextByte);
@@ -143,7 +184,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder {
             hasOPcode=true;
             len=0;
         }
-
         bytes[len++] = nextByte;
     }
 

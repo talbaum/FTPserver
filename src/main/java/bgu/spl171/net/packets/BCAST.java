@@ -7,7 +7,9 @@ import bgu.spl171.net.api.Message;
  */
 public class BCAST implements Message {
     public String brodcast (int isDeleted , String filename){
+    for(String user: loggedUsers){
 
+    }
 
     }
 

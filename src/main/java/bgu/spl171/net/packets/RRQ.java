@@ -12,7 +12,7 @@ public class RRQ implements Message {
         if(files.contains(filename))
             return ACK.checkACK(0,false);
         else
-            return ERROR.getError(2,"");
+            return ERROR.getError(1,"");
     }
 
     @Override
