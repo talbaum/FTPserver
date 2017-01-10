@@ -12,7 +12,7 @@ public class DISC implements Message {
                 loggedUsers.remove(username);
                 return ACK.checkACK(0,false);
             }
-            }
+        }
        return ERROR.getError(6,"");
    }
     @Override
