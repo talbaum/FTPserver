@@ -1,4 +1,4 @@
-package bgu.spl171.net.packetsNew;
+package bgu.spl171.net.srv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
@@ -8,6 +8,12 @@ public class BCAST extends Packet{
 	private String Filename;
 	private int byteCounter = 0;
 	private Vector<Byte> byteVector = new Vector<>();
+
+	public Vector<Byte> getByteVector() {
+		return byteVector;
+	}
+
+
 	
 	protected byte[] encode(){
 		

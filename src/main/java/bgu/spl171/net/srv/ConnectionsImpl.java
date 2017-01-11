@@ -42,6 +42,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     public void disconnect(int connectionId) {
         try {
             MyConnections.get(connectionId).close();
+            MyConnections.remove(connectionId);
         } catch (IOException e) {
             e.printStackTrace();
         }

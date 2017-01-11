@@ -1,4 +1,4 @@
-package bgu.spl171.net.packetsNew;
+package bgu.spl171.net.srv;
 
 public class DISC extends Packet{
 

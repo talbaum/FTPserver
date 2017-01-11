@@ -1,9 +1,9 @@
-package bgu.spl171.net.packetsNew;
+package bgu.spl171.net.srv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
-public class DELRQ extends Packet{
+public class RRQandWRQ extends Packet{
 	private String Filename;
 	private Vector<Byte> byteVector = new Vector<>();
 	
@@ -42,4 +42,5 @@ public class DELRQ extends Packet{
 		}
 	}
 
+	
 }

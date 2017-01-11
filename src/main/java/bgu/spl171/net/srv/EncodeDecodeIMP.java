@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
 
+    ConcurrentLinkedQueue<byte[]> Packets = new ConcurrentLinkedQueue<>();
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
     boolean isLogged=false;

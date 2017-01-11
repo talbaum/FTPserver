@@ -1,7 +1,7 @@
-package bgu.spl171.net.packetsNew;
+package bgu.spl171.net.srv;
 
 abstract public class Packet{
-	protected short Opcode;
+	short Opcode;
 	
 	public byte[] shortToBytes(short num)
 	{
@@ -19,7 +19,7 @@ abstract public class Packet{
 	    result += (short)(byteArr[1] & 0xff);
 	    return result;
 	}
-	protected short getOpcode(){
+	public short getOpcode(){
 		return this.Opcode;
 	}
 }
