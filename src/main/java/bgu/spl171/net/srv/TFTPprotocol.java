@@ -9,13 +9,13 @@ import java.util.Vector;
  * Created by baum on 10/01/2017.
  */
 public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
-    //T response=null;
     int ID;
     ConnectionsImpl Connections1;
     @Override
     public void start(int connectionId, Connections<T> connections) {
         this.Connections1=(ConnectionsImpl)connections;
         this.ID=connectionId;
+        
     }
 
     @Override
@@ -52,9 +52,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 }
                 ans = bytes;
                 Connections1.broadcast(ans);
+                break;
 
             case 10:
                 Connections1.disconnect(ID);
+                break;
         }
     Connections1.send(ID,message);
     }
