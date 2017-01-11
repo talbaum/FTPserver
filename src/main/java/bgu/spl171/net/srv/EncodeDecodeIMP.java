@@ -105,6 +105,7 @@ public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
                     return encode(ERROR.getError(6, ""));
 
             case 7:
+                if(!isLogged) {
                     LOGRQ tmp7 = new LOGRQ();
                     if (nextByte == 0) {
                         username = popString();
@@ -115,8 +116,10 @@ public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
                         return encode(ans);
                     } else
                         pushByte(nextByte);
-                    return null;
-
+                            return null;
+                }
+                else
+                    return encode(ERROR.getError(7, ""));
             case 8:
                 if (isLogged) {
                     DELRQ tmp8 = new DELRQ();

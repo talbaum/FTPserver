@@ -9,11 +9,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class LOGRQ implements Message {
     private String username;
-    private ConcurrentLinkedQueue users= new ConcurrentLinkedQueue();
 
     public String LOGRQ(String username){
-        if (!users.contains(username)) {
-            users.add(username);
+        if (!loggedUsers.contains(username)) {
+           loggedUsers.add(username);
             this.username = username;
           return ACK.checkACK(0,false);
         }

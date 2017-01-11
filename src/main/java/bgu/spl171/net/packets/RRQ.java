@@ -10,7 +10,7 @@ public class RRQ implements Message {
 
     public String read (String filename){
         if(files.contains(filename))
-            return ACK.checkACK(0,false);
+            return ACK.checkACK(0,false); //return byte array
         else
             return ERROR.getError(1,"");
     }
