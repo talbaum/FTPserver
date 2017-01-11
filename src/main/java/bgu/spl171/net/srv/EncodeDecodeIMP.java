@@ -13,14 +13,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
 
-    //private final ConnectionsImpl<T> connections;
-
-    //EncodeDecodeIMP(ConnectionsImpl con){
-     //   this.connections=con;
-    //}
-
-    ConcurrentLinkedQueue<Message> AllPackets = new ConcurrentLinkedQueue<>();
-
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
     boolean isLogged=false;
@@ -203,6 +195,9 @@ public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
         //this is not actually required as it is the default encoding in java.
         String result = new String(bytes, 0, len, StandardCharsets.UTF_8);
         len = 0;
+        OPcode=0;
+        hasBlock=false;
+        hasOPcode=false;
         return result;
     }
 }
