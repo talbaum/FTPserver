@@ -18,7 +18,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
 
     public void addConnection(NonBlockingConnectionHandler<T> CH){
         MyConnections.put(nextId++,CH);
-        CH.AddAllCon(MyConnections);
+        //CH.AddAllCon(MyConnections);
     }
 
     @Override
