@@ -1,21 +1,25 @@
 package bgu.spl171.net.srv;
 
+import bgu.spl171.net.api.Message;
 import bgu.spl171.net.api.MessageEncoderDecoder;
 import bgu.spl171.net.packets.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by amitu on 08/01/2017.
  */
 public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
 
-    private final ConnectionsImpl<T> connections;
+    //private final ConnectionsImpl<T> connections;
 
-    EncodeDecodeIMP(ConnectionsImpl con){
-        this.connections=con;
-    }
+    //EncodeDecodeIMP(ConnectionsImpl con){
+     //   this.connections=con;
+    //}
+
+    ConcurrentLinkedQueue<Message> AllPackets = new ConcurrentLinkedQueue<>();
 
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
