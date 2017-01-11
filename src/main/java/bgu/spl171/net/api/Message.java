@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public interface Message {
     ConcurrentLinkedQueue <String> files=new ConcurrentLinkedQueue<>();
     ConcurrentLinkedQueue<String> loggedUsers= new ConcurrentLinkedQueue<>();
+    LinkedList<Byte> singleFileData= new LinkedList<Byte>();
 
     short getOpCode();
 

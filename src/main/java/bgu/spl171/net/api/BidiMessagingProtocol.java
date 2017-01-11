@@ -5,6 +5,8 @@
  */
 package bgu.spl171.net.api;
 
+import java.util.LinkedList;
+
 /**
  *
  * @author bennyl
