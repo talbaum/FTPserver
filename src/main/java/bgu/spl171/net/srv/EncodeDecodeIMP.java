@@ -9,7 +9,13 @@ import java.util.Arrays;
 /**
  * Created by amitu on 08/01/2017.
  */
-public class EncodeDecodeIMP implements MessageEncoderDecoder {
+public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
+
+    private final ConnectionsImpl<T> connections;
+
+    EncodeDecodeIMP(ConnectionsImpl con){
+        this.connections=con;
+    }
 
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;

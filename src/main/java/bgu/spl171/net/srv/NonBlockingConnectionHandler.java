@@ -1,10 +1,7 @@
 package bgu.spl171.net.srv;
 
-import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.MessageEncoderDecoder;
 import bgu.spl171.net.api.MessagingProtocol;
-import com.sun.xml.internal.bind.v2.TODO;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
@@ -19,15 +16,15 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private static final int BUFFER_ALLOCATION_SIZE = 1 << 13; //8k
     private static final ConcurrentLinkedQueue<ByteBuffer> BUFFER_POOL = new ConcurrentLinkedQueue<>();
 
-    private final BidiMessagingProtocol<T> protocol;
+    private final MessagingProtocol<T> protocol;
     private final MessageEncoderDecoder<T> encdec;
-    private final Queue<ByteBuffer> writeQueue = new LinkedList<>();
+    private final Queue<ByteBuffer> writeQueue = new ConcurrentLinkedQueue<>();
     private final SocketChannel chan;
     private final Reactor reactor;
 
     public NonBlockingConnectionHandler(
             MessageEncoderDecoder<T> reader,
-            BidiMessagingProtocol<T> protocol,
+            MessagingProtocol<T> protocol,
             SocketChannel chan,
             Reactor reactor) {
         this.chan = chan;
@@ -42,8 +39,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         boolean success = false;
         try {
             success = chan.read(buf) != -1;
-        } catch (ClosedByInterruptException ex) {
-            Thread.currentThread().interrupt();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -103,7 +98,8 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         }
 
         if (writeQueue.isEmpty()) {
-            reactor.updateInterestedOps(chan, SelectionKey.OP_READ);
+	    if (protocol.shouldTerminate()) close();
+	    else reactor.updateInterestedOps(chan, SelectionKey.OP_READ);
         }
     }
 
@@ -121,8 +117,4 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         BUFFER_POOL.add(buff);
     }
 
-    @Override
-    public void send(T msg) {
-        //TODO
-    }
 }

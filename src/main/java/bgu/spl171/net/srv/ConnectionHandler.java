@@ -6,14 +6,10 @@
 package bgu.spl171.net.srv;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
- *
- * @author bennyl
+ * The ConnectionHandler interface for Message of type T
  */
-public interface ConnectionHandler<T> extends Closeable{
-
-    void send(T msg) ;
-
+public interface ConnectionHandler<T> extends Closeable {
+    
 }

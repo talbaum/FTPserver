@@ -1,6 +1,5 @@
 package bgu.spl171.net.srv;
 
-import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.MessageEncoderDecoder;
 import bgu.spl171.net.api.MessagingProtocol;
 import java.io.BufferedInputStream;
@@ -10,14 +9,14 @@ import java.net.Socket;
 
 public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler<T> {
 
-    private final BidiMessagingProtocol<T> protocol;
+    private final MessagingProtocol<T> protocol;
     private final MessageEncoderDecoder<T> encdec;
     private final Socket sock;
     private BufferedInputStream in;
     private BufferedOutputStream out;
     private volatile boolean connected = true;
 
-    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, BidiMessagingProtocol<T> protocol) {
+    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, MessagingProtocol<T> protocol) {
         this.sock = sock;
         this.encdec = reader;
         this.protocol = protocol;
@@ -25,7 +24,6 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
 
     @Override
     public void run() {
-
         try (Socket sock = this.sock) { //just for automatic closing
             int read;
 
@@ -35,7 +33,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
             while (connected && (read = in.read()) >= 0) {
                 T nextMessage = encdec.decodeNextByte((byte) read);
                 if (nextMessage != null) {
-                    T response = protocol.process(nextMessage); //use send at this class?
+                    T response = protocol.process(nextMessage);
                     if (response != null) {
                         out.write(encdec.encode(response));
                         out.flush();
@@ -53,10 +51,5 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     public void close() throws IOException {
         connected = false;
         sock.close();
-    }
-
-    @Override
-    public void send(T msg) {
-        //TODO
     }
 }
