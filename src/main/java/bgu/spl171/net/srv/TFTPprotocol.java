@@ -16,7 +16,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     @Override
     public void process(T message) {
-    
+
     }
 
     @Override
