@@ -1,3 +1,4 @@
+/*
 package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.Message;
@@ -8,9 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+*/
 /**
  * Created by amitu on 08/01/2017.
- */
+ *//*
+
 public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
 
     ConcurrentLinkedQueue<byte[]> Packets = new ConcurrentLinkedQueue<>();
@@ -205,3 +208,4 @@ public class EncodeDecodeIMP<T> implements MessageEncoderDecoder {
         return result;
     }
 }
+*/

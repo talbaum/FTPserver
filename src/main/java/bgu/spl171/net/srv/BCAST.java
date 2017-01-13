@@ -52,7 +52,5 @@ public class BCAST extends Packet{
 			}
 		}
 	}
-	public Vector<Byte> getByteVector() {
-		return byteVector;
-	}
+
 }
