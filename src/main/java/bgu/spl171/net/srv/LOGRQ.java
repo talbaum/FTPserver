@@ -4,13 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 public class LOGRQ extends Packet{
-	private String Username;
+	public String username;
 	private Vector<Byte> byteVector = new Vector<>();
 	
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
-		byte[] BFL = Username.getBytes();
+		byte[] BFL = username.getBytes();
 		byte[] ans = new byte[BOpcode.length + BFL.length + 1];
 		
 		for (int i=0; i<BOpcode.length; i++){
@@ -37,7 +37,7 @@ public class LOGRQ extends Packet{
 			for (int i=0; i<byteString.length; i++){
 				byteString[i] = byteVector.get(i);
 			}
-			this.Username = new String(byteString, StandardCharsets.UTF_8);
+			this.username = new String(byteString, StandardCharsets.UTF_8);
 			return this;
 		}
 	}

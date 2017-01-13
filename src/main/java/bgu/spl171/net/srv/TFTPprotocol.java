@@ -2,6 +2,7 @@ package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.Connections;
+import bgu.spl171.net.packets.*;
 
 
 import java.io.FileOutputStream;
@@ -16,23 +17,25 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     int ID;
     ConnectionsImpl connections;
     ConcurrentLinkedQueue<String> files = new ConcurrentLinkedQueue<>();
-    ConcurrentLinkedQueue<String> loggedUsers = new ConcurrentLinkedQueue<>();
-    LinkedList<Byte> singleFileData = new LinkedList<Byte>();
+    LinkedList<Byte> singleFileData = new LinkedList<>();
+    boolean isBcast=false;
+    boolean isLogged;
 
     @Override
     public void start(int connectionId, Connections<T> connections) {
         this.connections = (ConnectionsImpl) connections;
         this.ID = connectionId;
-
+        this.isLogged=false;
     }
 
     @Override
     public void process(T message) {
         Packet tmp = (Packet) message;
-        Vector<Byte> byteVector;
         short OP = tmp.getOpcode();
         byte[] ans=null;
-
+    if(OP!=7 && !isLogged)
+        ans= getError(6,""); //user not logged in. cant make action.
+    else {
         switch (OP) {
             case 1:
                 //need to read file
@@ -50,11 +53,13 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                         files.add(filename);
                         ans = checkACK(0, false);
                         break;
-                    } else
+                    } else {
                         ans = getError(0, ""); //unknown error
                         break;
+                    }
                 } else
                     ans = getError(5, ""); //file already exist
+
                 break;
 
             case 3:
@@ -70,8 +75,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                         byteArray[i] = singleFileData.pollFirst();
                         i++;
                     }
-                    if (!byteToFile(byteArray))
-                    {
+                    if (!byteToFile(byteArray)) {
                         ans = getError(2, "");
                         break;
                     }
@@ -80,36 +84,69 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 break;
 
             case 4:
-                if(tmp.getOpcode()==3){
+                if (tmp.getOpcode() == 3) {
                     //this is a data block, can send another block of data
-                    ans=checkACK( ((DATA)tmp).blockNum , true);
-                }
-                else{
-                    ans= checkACK(0,false);
+                    ans = checkACK(((DATA) tmp).blockNum, true);
+                } else {
+                    ans = checkACK(0, false);
                 }
                 break;
 
             case 5:
+                ans = getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
+                break;
 
             case 6:
+                String allFilesNames = "";
+                for (String nameOfFile : files) {
+                    allFilesNames += nameOfFile + " \0 ";
+                }
+                if (allFilesNames.equals(""))
+                    ans = getError(0, "No Files to show");
+                else
+                    ans = allFilesNames.getBytes();
                 break;
 
             case 7:
-
-            case 8:
-                DELRQ tmp8 = (DELRQ) tmp;
-
+                String username = ((LOGRQ) tmp).username;
+                if (!connections.MyConnections.contains(username)) {
+                    connections.MyConnections.put(ID, username);
+                    isLogged = true;
+                    ans = checkACK(0, false);
+                } else
+                    ans = getError(7, ""); //user already logged in
 
                 break;
+
+            case 8:
+                String filenameToDel = ((DELRQ) tmp).filename;
+                if (files.contains(filenameToDel)) {
+                    for (String file : files)
+                        if (file.equals(filenameToDel)) {
+                            files.remove(file);
+                            //need to actual delete the data from the server
+                            ans = checkACK(0, false);
+                        }
+                } else
+                    ans = getError(1, "");
+                break;
+
             case 9:
                 connections.broadcast(((BCAST) tmp).encode());
+                isBcast = true;
                 break;
 
             case 10:
                 connections.disconnect(ID);
+                isLogged = false;
+                ans = checkACK(0, false);
                 break;
         }
-        connections.send(ID, ans);
+    }
+        if(!isBcast)
+            connections.send(ID, ans);
+        else
+            isBcast=false;
     }
 
 
