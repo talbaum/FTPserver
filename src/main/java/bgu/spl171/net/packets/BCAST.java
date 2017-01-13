@@ -10,7 +10,7 @@ public class BCAST implements Message {
     for(String user: loggedUsers){
 
     }
-
+return "";
     }
 
     @Override

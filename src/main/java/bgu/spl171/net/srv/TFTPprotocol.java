@@ -2,14 +2,14 @@ package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.Connections;
-import bgu.spl171.net.packets.*;
 
 
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.LinkedList;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 /**
  * Created by baum on 10/01/2017.
@@ -34,12 +34,13 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         Packet tmp = (Packet) message;
         short OP = tmp.getOpcode();
         byte[] ans=null;
+        LinkedList<Byte> emptyList=new LinkedList<>();
 
         switch (OP) {
             case 1:
                 //need to read file
-                String fileToRead=((RRQandWRQ) message).getFileName();
-                if (files.contains(fileToRead))
+                String fileToRead=((RRQandWRQ) tmp).getFileName();
+                if (files.containsKey(fileToRead))
                     ans=read(fileToRead);
                 else
                     ans = getError(5, "");
@@ -47,10 +48,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 break;
 
             case 2:
+
                 fileToWrite = ((RRQandWRQ) message).getFileName();
-                if (!files.contains(fileToWrite)) {
+                if (!files.containsKey(fileToWrite)) {
                     if (byteToFile(((RRQandWRQ) tmp).encode())) {
-                        files.put(fileToWrite,null);
+                        files.put(fileToWrite,emptyList);
                         ans = checkACK(0, false);
                         break;
                     } else
@@ -64,12 +66,14 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 //need to check how to receive few blocks untill the data is finished
                 String letAllKnow=null;
                 byte[] byteArray = ((DATA) tmp).data;
+
                 for (int i = 0; i < byteArray.length; i++)
                     singleFileData.add(byteArray[i]);
 
                 if (((DATA) tmp).packetSize < 512) {
-                    files.replace(fileToWrite,null,singleFileData);
+                    files.replace(fileToWrite,emptyList,singleFileData);
                     byteArray = new byte[singleFileData.size()];
+
                     int i = 0;
                     while (!singleFileData.isEmpty()) {
                         byteArray[i] = singleFileData.pollFirst();
@@ -86,7 +90,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     }
                 }
                 if(letAllKnow==null)
-                ans = checkACK(((DATA) tmp).blockNum, true);
+                    ans = checkACK(((DATA) tmp).blockNum, true);
 
                 break;
 
@@ -128,10 +132,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
             case 8:
                 String filenameToDel=((DELRQ)tmp).filename;
-                if(files.contains(filenameToDel)) {
+                if(files.containsKey(filenameToDel)) {
                     files.remove(filenameToDel);
-                    //need to actual delete the data from the server
-                    ans = checkACK(0, false);
+                   if(removeFromFilesFolder(filenameToDel))
+                        ans = checkACK(0, false);
+                   else
+                       ans=getError(2,"");
                 }
                 else
                     ans=getError(1,"");
@@ -203,14 +209,37 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     private byte[] read(String readMe){
         byte[] arr= new byte[512];
-       LinkedList<Byte> readedFile= files.get(readMe);
+       LinkedList<Byte> readedFileBytes= files.get(readMe);
        int i=0;
-       while(i<512 && !readedFile.isEmpty())
+       while(i<512 && !readedFileBytes.isEmpty())
        {
-           arr[i]=readedFile.pollFirst();
+           arr[i]=readedFileBytes.pollFirst();
             i++;
        }
+       if(readedFileBytes.isEmpty())
+           removeFromFilesFolder(readMe);
+
        return arr;
     }
+
+    private boolean removeFromFilesFolder(String deleteMe) {
+        try {
+            Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\src\\main\\java\\bgu\\spl171\\net\\srv\\Files\\" +deleteMe);
+            Files.delete(p1);
+            return true;
+        } catch (NoSuchFileException x) {
+            System.out.println("no such file or directory");
+            return false;
+        } catch (DirectoryNotEmptyException x) {
+            System.out.println("file is not empty");
+            return false;
+        } catch (IOException x) {
+            System.err.println(x);
+            return false;
+        }
+    }
+
+
+
 
 }
