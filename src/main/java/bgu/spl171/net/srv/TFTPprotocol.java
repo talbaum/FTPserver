@@ -40,15 +40,22 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             case 1:
                 //need to read file
                 String fileToRead=((RRQandWRQ) tmp).getFileName();
-                if (files.containsKey(fileToRead))
-                    ans=read(fileToRead);
+                if (files.containsKey(fileToRead)) {
+                    if (files.get(fileToRead).isEmpty()) {
+                        String letAllKnowRead = fileToRead + " has completed uploading to the server.";
+                        connections.broadcast(letAllKnowRead.getBytes());
+                        break;
+                    }
+                    else {
+                        ans = read(fileToRead);
+                    }
+                }
                 else
                     ans = getError(5, "");
 
                 break;
 
             case 2:
-
                 fileToWrite = ((RRQandWRQ) message).getFileName();
                 if (!files.containsKey(fileToWrite)) {
                     if (byteToFile(((RRQandWRQ) tmp).encode())) {
@@ -86,7 +93,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     }
                     else{
                         letAllKnow=fileToWrite+" has completed uploading to the server.";
-                                connections.broadcast(letAllKnow);
+                                connections.broadcast(letAllKnow.getBytes());
                     }
                 }
                 if(letAllKnow==null)
