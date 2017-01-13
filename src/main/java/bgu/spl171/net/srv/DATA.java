@@ -3,18 +3,18 @@ package bgu.spl171.net.srv;
 import java.nio.ByteBuffer;
 
 public class DATA extends Packet{
-	private short packetSize;
+	public short packetSize;
 	private byte[] PS = new byte[2];
-	private short block;
+	public short blockNum;
 	private byte[] BL = new byte[2];
-	private byte[] data;
+	public byte[] data;
 	private int byteCounter = 0;
 	
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
 		byte[] BpacketSize = ByteBuffer.allocate(4).putInt(packetSize).array();
-		byte[] Bblock = ByteBuffer.allocate(4).putInt(block).array();
+		byte[] Bblock = ByteBuffer.allocate(4).putInt(blockNum).array();
 		byte[] ans = new byte[BOpcode.length + BpacketSize.length + Bblock.length + data.length];
 		
 		for (int i=0; i<BOpcode.length; i++){
@@ -52,7 +52,7 @@ public class DATA extends Packet{
 		}
 		else if (this.byteCounter == 3){
 			BL[1] = nextByte;
-			block = bytesToShort(BL);
+			blockNum = bytesToShort(BL);
 			this.byteCounter++;
 			return null;
 		}

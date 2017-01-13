@@ -4,9 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 public class ERROR extends Packet{
-	private short errorCode;
+	public short errorCode;
 	private byte[] EC = new byte[2];
-	private String errMsg;
+	public String errMsg;
 	private Vector<Byte> byteVector = new Vector<>();
 	private int byteCounter = 0;
 	

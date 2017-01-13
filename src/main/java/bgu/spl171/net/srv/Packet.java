@@ -2,7 +2,7 @@ package bgu.spl171.net.srv;
 
 abstract public class Packet{
 	short Opcode;
-	
+
 	public byte[] shortToBytes(short num)
 	{
 	    byte[] bytesArr = new byte[2];
@@ -22,4 +22,5 @@ abstract public class Packet{
 	public short getOpcode(){
 		return this.Opcode;
 	}
+
 }

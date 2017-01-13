@@ -41,6 +41,8 @@ public class RRQandWRQ extends Packet{
 			return this;
 		}
 	}
-
+	public String getFileName() {
+		return Filename;
+	}
 	
 }

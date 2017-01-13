@@ -9,12 +9,6 @@ public class BCAST extends Packet{
 	private int byteCounter = 0;
 	private Vector<Byte> byteVector = new Vector<>();
 
-	public Vector<Byte> getByteVector() {
-		return byteVector;
-	}
-
-
-	
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
@@ -57,5 +51,8 @@ public class BCAST extends Packet{
 				return this;
 			}
 		}
+	}
+	public Vector<Byte> getByteVector() {
+		return byteVector;
 	}
 }
