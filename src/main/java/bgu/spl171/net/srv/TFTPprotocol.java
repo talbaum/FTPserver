@@ -20,12 +20,14 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     ConcurrentHashMap<String, LinkedList<Byte>> files = new ConcurrentHashMap<>();
     LinkedList<Byte> singleFileData = new LinkedList<>();
     boolean isBcast=false;
+    boolean isLogged;
     String fileToWrite;
 
     @Override
     public void start(int connectionId, Connections<T> connections) {
         this.connections = (ConnectionsImpl) connections;
         this.ID = connectionId;
+        this.isLogged=false;
 
     }
 
@@ -33,145 +35,144 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     public void process(T message) {
         Packet tmp = (Packet) message;
         short OP = tmp.getOpcode();
-        byte[] ans=null;
-        LinkedList<Byte> emptyList=new LinkedList<>();
+        byte[] ans = null;
+        LinkedList<Byte> emptyList = new LinkedList<>();
 
-        switch (OP) {
-            case 1:
-                //need to read file
-                String fileToRead=((RRQandWRQ) tmp).getFileName();
-                if (files.containsKey(fileToRead)) {
-                    if (files.get(fileToRead).isEmpty()) {
-                        String letAllKnowRead = fileToRead + " has completed uploading to the server.";
-                        connections.broadcast(letAllKnowRead.getBytes());
-                        break;
-                    }
-                    else {
-                        ans = read(fileToRead);
-                    }
-                }
-                else
-                    ans = getError(5, "");
+        if (!isLogged && OP != 7) {
+            ans = getError(6, ""); //user not logged in- cant make actions
+        } else {
+            switch (OP) {
+                case 1:
+                    //need to read file
+                    String fileToRead = ((RRQandWRQ) tmp).getFileName();
+                    if (files.containsKey(fileToRead)) {
+                        if (files.get(fileToRead).isEmpty()) {
+                            String letAllKnowRead = fileToRead + " has completed uploading to the server.";
+                            connections.broadcast(letAllKnowRead.getBytes());
+                            break;
+                        } else {
+                            ans = read(fileToRead);
+                        }
+                    } else
+                        ans = getError(1, ""); //file not found for reading
 
-                break;
+                    break;
 
-            case 2:
-                fileToWrite = ((RRQandWRQ) message).getFileName();
-                if (!files.containsKey(fileToWrite)) {
-                    if (byteToFile(((RRQandWRQ) tmp).encode())) {
-                        files.put(fileToWrite,emptyList);
-                        ans = checkACK(0, false);
+                case 2:
+                    fileToWrite = ((RRQandWRQ) message).getFileName();
+                    if (!files.containsKey(fileToWrite)) {
+                        if (byteToFile(((RRQandWRQ) tmp).encode())) { //need to make sure that
+                            files.put(fileToWrite, emptyList);
+                            ans = checkACK(0, false);
+                            break;
+                        } else
+                            ans = getError(2, ""); //file cannot be written error
                         break;
                     } else
-                        ans = getError(0, ""); //unknown error
-                        break;
-                } else
-                    ans = getError(5, ""); //file already exist
-                break;
+                        ans = getError(5, ""); //file already exist
+                    break;
 
-            case 3:
-                //need to check how to receive few blocks untill the data is finished
-                String letAllKnow=null;
-                byte[] byteArray = ((DATA) tmp).data;
+                case 3:
+                    //need to check how to receive few blocks untill the data is finished
+                    String letAllKnow = null;
+                    byte[] byteArray = ((DATA) tmp).data;
 
-                for (int i = 0; i < byteArray.length; i++)
-                    singleFileData.add(byteArray[i]);
+                    for (int i = 0; i < byteArray.length; i++)
+                        singleFileData.add(byteArray[i]);
 
-                if (((DATA) tmp).packetSize < 512) {
-                    files.replace(fileToWrite,emptyList,singleFileData);
-                    byteArray = new byte[singleFileData.size()];
+                    if (((DATA) tmp).packetSize < 512) {
+                        files.replace(fileToWrite, emptyList, singleFileData);
+                        byteArray = new byte[singleFileData.size()];
 
-                    int i = 0;
-                    while (!singleFileData.isEmpty()) {
-                        byteArray[i] = singleFileData.pollFirst();
-                        i++;
+                        int i = 0;
+                        while (!singleFileData.isEmpty()) {
+                            byteArray[i] = singleFileData.pollFirst();
+                            i++;
+                        }
+                        if (!byteToFile(byteArray)) {
+                            ans = getError(2, "");
+                            break;
+                        } else {
+                            letAllKnow = fileToWrite + " has completed uploading to the server.";
+                            connections.broadcast(letAllKnow.getBytes());
+                        }
                     }
-                    if (!byteToFile(byteArray))
-                    {
-                        ans = getError(2, "");
-                        break;
-                    }
-                    else{
-                        letAllKnow=fileToWrite+" has completed uploading to the server.";
-                                connections.broadcast(letAllKnow.getBytes());
-                    }
-                }
-                if(letAllKnow==null)
-                    ans = checkACK(((DATA) tmp).blockNum, true);
+                    if (letAllKnow == null)
+                        ans = checkACK(((DATA) tmp).blockNum, true);
 
-                break;
+                    break;
 
-            case 4:
-                if(tmp.getOpcode()==3){
-                    //this is a data block, can send another block of data
-                    ans=checkACK( ((DATA)tmp).blockNum , true);
-                }
-                else{
-                    ans= checkACK(0,false);
-                }
-                break;
-
-            case 5:
-            ans= getError(((ERROR)tmp).errorCode ,  ((ERROR)tmp).errMsg);
-            break;
-
-            case 6:
-                String allFilesNames="";
-                for (String nameOfFile : files.keySet()) {
-                    allFilesNames+= nameOfFile + " \0 ";
-                }
-                if(allFilesNames.equals(""))
-                    ans=getError(0,"No Files to show");
-                else
-                    ans= allFilesNames.getBytes();
-                break;
-
-            case 7:
-                String username= ((LOGRQ)tmp).username;
-               if(!connections.MyConnections.contains(username)){
-                    connections.MyConnections.put(ID,username);
-                    ans= checkACK(0,false);
-                }
-                else
-                    ans = getError(7, ""); //user already logged in
-
-                break;
-
-            case 8:
-                String filenameToDel=((DELRQ)tmp).filename;
-                if(files.containsKey(filenameToDel)) {
-                    files.remove(filenameToDel);
-                   if(removeFromFilesFolder(filenameToDel))
+                case 4:
+                    if (tmp.getOpcode() == 3) {
+                        //this is a data block, can send another block of data
+                        ans = checkACK(((DATA) tmp).blockNum, true);
+                    } else {
                         ans = checkACK(0, false);
-                   else
-                       ans=getError(2,"");
-                }
-                else
-                    ans=getError(1,"");
-                break;
+                    }
+                    break;
 
-            case 9:
-                connections.broadcast(((BCAST) tmp).encode());
-                isBcast=true;
-                break;
+                case 5:
+                    ans = getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
+                    break;
 
-            case 10:
-                connections.disconnect(ID);
-                ans= checkACK(0,false);
-                break;
+                case 6:
+                    String allFilesNames = "";
+                    for (String nameOfFile : files.keySet()) {
+                        allFilesNames += nameOfFile + " \0 ";
+                    }
+
+                    if (allFilesNames.equals(""))
+                        ans = getError(0, "No Files to show");
+                    else
+                        ans = allFilesNames.getBytes();
+                    break;
+
+                case 7:
+                    String username = ((LOGRQ) tmp).username;
+                    if (!connections.MyConnections.contains(username)) {
+                        connections.MyConnections.put(ID, username);
+                        isLogged = true;
+                        ans = checkACK(0, false);
+                    } else
+                        ans = getError(7, ""); //user already logged in
+
+                    break;
+
+                case 8:
+                    String filenameToDel = ((DELRQ) tmp).filename;
+                    if (files.containsKey(filenameToDel)) {
+                        files.remove(filenameToDel);
+                        if (removeFromFilesFolder(filenameToDel))
+                            ans = checkACK(0, false);
+                        else
+                            ans = getError(2, ""); //cannot read violation
+                    } else
+                        ans = getError(1, ""); //file not found
+                    break;
+
+                case 9:
+                    connections.broadcast(((BCAST) tmp).encode());
+                    isBcast = true;
+                    break;
+
+                case 10:
+                    connections.disconnect(ID);
+                    isLogged = false;
+                    ans = checkACK(0, false);
+                    break;
+            }
         }
-
-        if(!isBcast)
-            connections.send(ID, ans);
-        else
-            isBcast=false;
-    }
+            if (!isBcast)
+                connections.send(ID, ans);
+            else
+                isBcast = false;
+        }
 
 
     @Override
     public boolean shouldTerminate() {
-        return false;
-    }
+        return !isLogged;
+    } //need to make sure
 
     private byte[] checkACK(int blockNum, boolean isData) {
         if (!isData)
