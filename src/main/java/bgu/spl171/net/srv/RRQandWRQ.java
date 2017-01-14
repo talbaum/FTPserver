@@ -6,7 +6,11 @@ import java.util.Vector;
 public class RRQandWRQ extends Packet{
 	private String Filename;
 	private Vector<Byte> byteVector = new Vector<>();
-	
+
+	public RRQandWRQ(short opcode) {
+		super(opcode);
+	}
+
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);

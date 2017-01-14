@@ -9,7 +9,21 @@ public class DATA extends Packet{
 	private byte[] BL = new byte[2];
 	public byte[] data;
 	private int byteCounter = 0;
-	
+
+	public DATA(short opCode) {
+		super(opCode);
+		this.packetSize=0;
+		this.blockNum=0;
+		this.data=null;
+	}
+
+	public DATA(short opCode,short packetSize, short blockNum, byte[] data) {
+		super(opCode);
+		this.packetSize=packetSize;
+		this.blockNum=blockNum;
+		this.data=data;
+	}
+
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);

@@ -6,7 +6,11 @@ import java.util.Vector;
 public class DELRQ extends Packet{
 	public String filename;
 	private Vector<Byte> byteVector = new Vector<>();
-	
+
+	public DELRQ(short opcode) {
+		super(opcode);
+	}
+
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);

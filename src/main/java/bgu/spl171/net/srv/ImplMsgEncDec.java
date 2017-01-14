@@ -23,40 +23,40 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 			Opcode = bytesToShort(findOpcode);
 			switch (Opcode){
 				case(1):{
-					packet = new RRQandWRQ();
-					packet.Opcode = this.Opcode;
+					packet = new RRQandWRQ(Opcode);
+					break;
 				}
 				case(2):{
-					packet = new RRQandWRQ(); 
-					packet.Opcode = this.Opcode;
+					packet = new RRQandWRQ(Opcode);
+					break;
 				}
 				case(3):{
-					packet = new DATA();
-					packet.Opcode = this.Opcode;
+					packet = new DATA(Opcode);
+					break;
 				}
 				case(4):{
-					packet = new ACK();
-					packet.Opcode = this.Opcode;
+					packet = new ACK(Opcode);
+					break;
 				}
 				case(5):{
-					packet = new ERROR(); 
-					packet.Opcode = this.Opcode;
+					packet = new ERROR(Opcode);
+					break;
 				}
 				case(6): {
 					packet = new DIRQ(Opcode);
 					return packet;
 				}
 				case(7):{
-					packet = new LOGRQ(); 
-					packet.Opcode = this.Opcode;
+					packet = new LOGRQ(Opcode);
+					break;
 				}
 				case(8):{
-					packet = new DELRQ(); 
-					packet.Opcode = this.Opcode;
+					packet = new DELRQ(Opcode);
+					break;
 				}
 				case(9):{
-					packet = new BCAST(); 
-					packet.Opcode = this.Opcode;
+					packet = new BCAST(Opcode);
+					break;
 				}
 				case(10): {
 					packet = new DISC(Opcode); 

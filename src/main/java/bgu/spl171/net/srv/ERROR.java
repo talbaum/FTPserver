@@ -9,7 +9,11 @@ public class ERROR extends Packet{
 	public String errMsg;
 	private Vector<Byte> byteVector = new Vector<>();
 	private int byteCounter = 0;
-	
+
+	public ERROR(short opcode) {
+		super(opcode);
+	}
+
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);

@@ -6,7 +6,11 @@ public class ACK extends Packet{
 	private int block;
 	private byte[] BL = new byte[2];
 	private int byteCounter = 0;
-	
+
+	public ACK(short opcode) {
+		super(opcode);
+	}
+
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);

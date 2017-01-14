@@ -2,8 +2,8 @@ package bgu.spl171.net.srv;
 
 public class DIRQ extends Packet{
 
-	protected DIRQ(short Opcode){
-		this.Opcode = Opcode;
+	protected DIRQ(short opcode){
+		super(opcode);
 	}
 	
 	protected byte[] encode(){

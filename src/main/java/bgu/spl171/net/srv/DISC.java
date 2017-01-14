@@ -2,10 +2,11 @@ package bgu.spl171.net.srv;
 
 public class DISC extends Packet{
 
-	protected DISC(short Opcode){
-		this.Opcode = Opcode;
+
+	public DISC(short opcode) {
+		super(opcode);
 	}
-	
+
 	protected byte[] encode(){
 		
 		byte[] ans = shortToBytes(Opcode);

@@ -38,7 +38,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             ans = getError(6, ""); //user not logged in- cant make actions
         } else {
             switch (OP) {
-                case 1:
+                case 1: //RRQ
                     //need to read file
                     String fileToRead = ((RRQandWRQ) tmp).getFileName();
                     if (files.containsKey(fileToRead)) {
@@ -54,7 +54,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
                     break;
 
-                case 2:
+                case 2://WRQ
                     fileToWrite = ((RRQandWRQ) message).getFileName();
                     if (!files.containsKey(fileToWrite)) {
                         if (byteToFile(((RRQandWRQ) tmp).encode())) { //need to make sure that
@@ -68,7 +68,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                         ans = getError(5, ""); //file already exist
                     break;
 
-                case 3:
+                case 3: //DATA
                     //need to check how to receive few blocks untill the data is finished
                     String letAllKnow = null;
                     byte[] byteArray = ((DATA) tmp).data;
@@ -85,8 +85,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                             byteArray[i] = singleFileData.pollFirst();
                             i++;
                         }
+
                         if (!byteToFile(byteArray)) {
-                            ans = getError(2, "");
+                            ans = getError(2, ""); //cannot write error
                             break;
                         } else {
                             letAllKnow = fileToWrite + " has completed uploading to the server.";
@@ -98,7 +99,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
                     break;
 
-                case 4:
+                case 4://ACK
                     if (tmp.getOpcode() == 3) {
                         //this is a data block, can send another block of data
                         ans = checkACK(((DATA) tmp).blockNum, true);
@@ -107,11 +108,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     }
                     break;
 
-                case 5:
+                case 5://ERROR
                     ans = getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
                     break;
 
-                case 6:
+                case 6://DIRQ
                     String allFilesNames = "";
                     for (String nameOfFile : files.keySet()) {
                         allFilesNames += nameOfFile + " \0 ";
@@ -123,7 +124,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                         ans = allFilesNames.getBytes();
                     break;
 
-                case 7:
+                case 7://LOGRQ
                     String username = ((LOGRQ) tmp).username;
                     if (!connections.MyConnections.contains(username)) {
                         connections.MyConnections.put(ID, username);
@@ -134,7 +135,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
                     break;
 
-                case 8:
+                case 8://DELRQ
                     String filenameToDel = ((DELRQ) tmp).filename;
                     if (files.containsKey(filenameToDel)) {
                         files.remove(filenameToDel);
@@ -146,12 +147,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                         ans = getError(1, ""); //file not found
                     break;
 
-                case 9:
+                case 9://BCAST
                     connections.broadcast(((BCAST) tmp).encode());
                     isBcast = true;
                     break;
 
-                case 10:
+                case 10://DISC
                     connections.disconnect(ID);
                     isLogged = false;
                     ans = checkACK(0, false);
@@ -231,7 +232,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\src\\main\\java\\bgu\\spl171\\net\\srv\\Files\\" +deleteMe);
             Files.delete(p1);
             return true;
-        } catch (NoSuchFileException x) {
+        }
+        catch (NoSuchFileException x) {
             System.out.println("no such file or directory");
             return false;
         } catch (DirectoryNotEmptyException x) {

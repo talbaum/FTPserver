@@ -6,7 +6,11 @@ import java.util.Vector;
 public class LOGRQ extends Packet{
 	public String username;
 	private Vector<Byte> byteVector = new Vector<>();
-	
+
+	public LOGRQ(short opcode) {
+		super(opcode);
+	}
+
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);

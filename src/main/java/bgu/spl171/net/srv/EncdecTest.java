@@ -17,9 +17,9 @@ public class EncdecTest {
  //                  You can activate decode and then encode in order to see that you receive the same output as you started.
  //               *. Some of the tests are not relevant - You need to encode just: data, ack, bcast, and error. 
 //  testRRQDecode(encdec); // 1
- //  testWRQDecode(encdec); // 2
+   testWRQDecode(encdec); // 2
      testDataDecode(encdec); // 3
-//	testDataEncode(encdec); // 3
+	testDataEncode(encdec); // 3
 //	testACKDecode(encdec); // 4
 //	testACKEncode(encdec); // 4
 //	testErrorDecode(encdec); // 5
@@ -86,7 +86,7 @@ public class EncdecTest {
 		printArr(b);
 		for (int i=0; i<b.length; i++)
 			res=encdec.decodeNextByte(b[i]);
-		short opcode=((DATA)res).getOpcode();
+		short opcode=res.getOpcode();
 		short packetSize=((DATA)res).packetSize;
 		short blockNum=((DATA)res).blockNum;
 		byte[] dataBytes=((DATA)res).data;
@@ -96,11 +96,11 @@ public class EncdecTest {
 		printArr(dataBytes);
 	}
 	
-	/*public static void testDataEncode (ImplMsgEncDec encdec){
+	public static void testDataEncode (ImplMsgEncDec encdec){
 		byte[] b = {1,2,3,4,5};
-		DataPacket packet = new DataPacket(((short)3), ((short)5), ((short)261), b);
+		DATA packet = new DATA(((short)3), ((short)5), ((short)261), b);
 		byte[] res = encdec.encode(packet);
-		System.out.println("Encoding the packet " + packet.getOpcode() + " is the Opcode "+ packet.getPacketSize() + " is the packetSize " + packet.getBlockNum() + " is the Block Num " );
+		System.out.println("Encoding the packet " + packet.getOpcode() + " is the Opcode "+ packet.packetSize + " is the packetSize " + packet.blockNum + " is the Block Num " );
 		System.out.println("The data arr is " );
 		printArr(b);
 		System.out.print("Output: ");
@@ -109,7 +109,7 @@ public class EncdecTest {
 		System.out.println("The output should be {0,3,0,5,1,5,1,2,3,4,5}");
 	}
 	
-
+/*
 	public static void testDISCDecode (ImplMsgEncDec encdec){
 		byte[] b = {0,10}; 
 		ServerPacket res=null;
@@ -275,54 +275,54 @@ public class EncdecTest {
 		printArr(res); // Should be {0,1,68,97,110,97,0}
 		System.out.println("The output should be {0,1,68,97,110,97,0}");
 	}
-	
+	*/
 	public static void testWRQDecode (ImplMsgEncDec encdec){
 		byte[] b = {0,2,68,97,110,97,0};
-		ServerPacket res=null;
+		Packet res=null;
 		System.out.println("Before decoding, the Arr is");
 		printArr(b);
 		for (int i=0; i<b.length; i++)
 			res=encdec.decodeNextByte(b[i]);
-		short opcode=((WRQPacket)res).getOpcode();
-		String fileName=((WRQPacket)res).getFileName();
+		short opcode=((RRQandWRQ)res).getOpcode();
+		String fileName=((RRQandWRQ)res).getFileName();
 		System.out.println("After decoding the arr, we've got a packet!");
 		System.out.println("The opcode is " + opcode +" and the fileName is " + fileName);
 	}
-	
-	public static void testWRQEncode (ImplMsgEncDec encdec){
-		WRQPacket packet = new WRQPacket((short) 2, "Dana");
-		byte[] res = encdec.encode(packet);
-		System.out.println("Encoding the packet " + packet.getOpcode() + " Opcode " + packet.getFileName());
-		System.out.print("Output: ");
+	/*
+        public static void testWRQEncode (ImplMsgEncDec encdec){
+            RRQandWRQ packet = new RRQandWRQ((short) 2, "Dana");
+            byte[] res = encdec.encode(packet);
+            System.out.println("Encoding the packet " + packet.getOpcode() + " Opcode " + packet.getFileName());
+            System.out.print("Output: ");
 
-		printArr(res); // Should be {0,2,68,97,110,97,0}
-		System.out.println("The output should be {0,2,68,97,110,97,0}");
-	}
-	
-	public static void testACKDecode (ImplMsgEncDec encdec){
-		byte[] b = {0,4,14,20}; // bytesToShort({14,20})=(short)3604
-		ServerPacket res=null;
-		System.out.println("Before decoding, the Arr is");
-		printArr(b);
-		for (int i=0; i<b.length; i++)
-			res=encdec.decodeNextByte(b[i]);
-		short opcode=((AckPacket)res).getOpcode();
-		short blockNum=((AckPacket)res).getBlockNum();
-		System.out.println("After decoding the arr, we've got a packet!");
-		System.out.println("The opcode is " + opcode +" and the blockNum is " + blockNum);
-	}
-	
-	public static void testACKEncode (MessageEncoderDecoderImpl encdec){
-		AckPacket packet = new AckPacket((short) 4, ((short)3604)); // bytesToShort({14,20})=(short)3604
-		byte[] res = encdec.encode(packet);
-		System.out.println("Encoding the packet " + packet.getOpcode() + " Opcode " + packet.getBlockNum());
-		System.out.print("Output: ");
+            printArr(res); // Should be {0,2,68,97,110,97,0}
+            System.out.println("The output should be {0,2,68,97,110,97,0}");
+        }
 
-		printArr(res); // Should be {0,2,68,97,110,97,0}
-		System.out.println("The output should be {0,4,14,20}");
-	}
-	
-	*/
+        public static void testACKDecode (ImplMsgEncDec encdec){
+            byte[] b = {0,4,14,20}; // bytesToShort({14,20})=(short)3604
+            ServerPacket res=null;
+            System.out.println("Before decoding, the Arr is");
+            printArr(b);
+            for (int i=0; i<b.length; i++)
+                res=encdec.decodeNextByte(b[i]);
+            short opcode=((AckPacket)res).getOpcode();
+            short blockNum=((AckPacket)res).getBlockNum();
+            System.out.println("After decoding the arr, we've got a packet!");
+            System.out.println("The opcode is " + opcode +" and the blockNum is " + blockNum);
+        }
+
+        public static void testACKEncode (MessageEncoderDecoderImpl encdec){
+            AckPacket packet = new AckPacket((short) 4, ((short)3604)); // bytesToShort({14,20})=(short)3604
+            byte[] res = encdec.encode(packet);
+            System.out.println("Encoding the packet " + packet.getOpcode() + " Opcode " + packet.getBlockNum());
+            System.out.print("Output: ");
+
+            printArr(res); // Should be {0,2,68,97,110,97,0}
+            System.out.println("The output should be {0,4,14,20}");
+        }
+
+        */
 	public static void printArr(byte[] b){
 	//	System.out.print("Output: ");
 		for (int i=0; i<b.length; i++)
