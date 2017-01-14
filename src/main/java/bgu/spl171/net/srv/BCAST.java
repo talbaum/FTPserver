@@ -4,14 +4,22 @@ import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 public class BCAST extends Packet{
-	private byte deletedAdded;
-	private String Filename;
+	public byte deleteOrAdd;
+	public String Filename;
 	private int byteCounter = 0;
 	private Vector<Byte> byteVector = new Vector<>();
+
 
 	public BCAST(short opcode) {
 		super(opcode);
 	}
+
+	public BCAST(short opcode, byte deleteOrAdd, String broadcastMe) {
+		super(opcode);
+		this.deleteOrAdd=deleteOrAdd;
+		this.Filename=broadcastMe;
+	}
+
 
 	protected byte[] encode(){
 		
@@ -23,7 +31,7 @@ public class BCAST extends Packet{
 			ans[i] = BOpcode[i];
 		}
 		
-		ans[BOpcode.length] = deletedAdded;
+		ans[BOpcode.length] = deleteOrAdd;
 		
 		for (int i=0; i<BFL.length; i++){
 			ans[BOpcode.length + 1 + i] = BFL[i];
@@ -37,7 +45,7 @@ public class BCAST extends Packet{
 	@Override
 	protected Packet decode(byte nextByte) {
 		if (this.byteCounter == 0){
-			this.deletedAdded = nextByte;
+			this.deleteOrAdd = nextByte;
 			this.byteCounter++;
 			return null;
 		}

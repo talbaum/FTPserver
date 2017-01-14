@@ -11,7 +11,12 @@ public class LOGRQ extends Packet{
 		super(opcode);
 	}
 
-	protected byte[] encode(){
+    public LOGRQ(short opcode, String username) {
+        super(opcode);
+        this.username=username;
+    }
+
+    protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
 		byte[] BFL = username.getBytes();

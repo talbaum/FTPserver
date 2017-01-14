@@ -44,7 +44,7 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 				}
 				case(6): {
 					packet = new DIRQ(Opcode);
-					return packet;
+					break;
 				}
 				case(7):{
 					packet = new LOGRQ(Opcode);
@@ -59,11 +59,11 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 					break;
 				}
 				case(10): {
-					packet = new DISC(Opcode); 
-					return packet;
+					packet = new DISC(Opcode);
+					break;
 				}
 			}
-			return null; 
+			return packet;
 		}	
 		else return packet.decode(nextByte);	 
 	}

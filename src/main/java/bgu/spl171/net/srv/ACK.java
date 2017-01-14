@@ -3,11 +3,15 @@ package bgu.spl171.net.srv;
 import java.nio.ByteBuffer;
 
 public class ACK extends Packet{
-	private int block;
+	public int block; //int?
 	private byte[] BL = new byte[2];
 	private int byteCounter = 0;
 
 	public ACK(short opcode) {
+		super(opcode);
+	}
+
+	public ACK(short opcode, short i1) {
 		super(opcode);
 	}
 

@@ -11,7 +11,12 @@ public class RRQandWRQ extends Packet{
 		super(opcode);
 	}
 
-	protected byte[] encode(){
+    public RRQandWRQ(short opcode, String filename) {
+        super(opcode);
+        this.Filename=filename;
+    }
+
+    protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
 		byte[] BFL = Filename.getBytes();

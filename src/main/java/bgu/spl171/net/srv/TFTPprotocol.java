@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by baum on 10/01/2017.
  */
 public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
+
     int ID;
     ConnectionsImpl connections;
     ConcurrentHashMap<String, LinkedList<Byte>> files = new ConcurrentHashMap<>();
@@ -32,7 +33,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         Packet tmp = (Packet) message;
         short OP = tmp.getOpcode();
         byte[] ans = null;
-        LinkedList<Byte> emptyList = new LinkedList<>();
+        final LinkedList<Byte> EMPTYLIST = new LinkedList<>();
 
         if (!isLogged && OP != 7) {
             ans = getError(6, ""); //user not logged in- cant make actions
@@ -58,7 +59,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     fileToWrite = ((RRQandWRQ) message).getFileName();
                     if (!files.containsKey(fileToWrite)) {
                         if (byteToFile(((RRQandWRQ) tmp).encode())) { //need to make sure that
-                            files.put(fileToWrite, emptyList);
+                            files.put(fileToWrite, EMPTYLIST);
                             ans = checkACK(0, false);
                             break;
                         } else
@@ -77,7 +78,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                         singleFileData.add(byteArray[i]);
 
                     if (((DATA) tmp).packetSize < 512) {
-                        files.replace(fileToWrite, emptyList, singleFileData);
+                        files.replace(fileToWrite, EMPTYLIST, singleFileData);
                         byteArray = new byte[singleFileData.size()];
 
                         int i = 0;

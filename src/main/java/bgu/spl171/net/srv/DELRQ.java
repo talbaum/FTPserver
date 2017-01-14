@@ -11,7 +11,12 @@ public class DELRQ extends Packet{
 		super(opcode);
 	}
 
-	protected byte[] encode(){
+    public DELRQ(short opcode, String filename) {
+        super(opcode);
+        this.filename=filename;
+    }
+
+    protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
 		byte[] BFL = filename.getBytes();

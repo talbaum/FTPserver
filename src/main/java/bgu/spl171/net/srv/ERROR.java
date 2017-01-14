@@ -14,7 +14,13 @@ public class ERROR extends Packet{
 		super(opcode);
 	}
 
-	protected byte[] encode(){
+    public ERROR(short opcode, short errorCode, String errorMsg) {
+        super(opcode);
+        this.errorCode=errorCode;
+        this.errMsg=errorMsg;
+    }
+
+    protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
 		byte[] BerrorCode = shortToBytes(errorCode);
