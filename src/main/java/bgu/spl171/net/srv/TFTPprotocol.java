@@ -1,5 +1,4 @@
 package bgu.spl171.net.srv;
-
 import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.Connections;
 
@@ -9,8 +8,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
-
-
 /**
  * Created by baum on 10/01/2017.
  */
@@ -28,7 +25,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         this.connections = (ConnectionsImpl) connections;
         this.ID = connectionId;
         this.isLogged=false;
-
     }
 
     @Override

@@ -1,3 +1,4 @@
+/*
 package bgu.spl171.net.impl.newsfeed;
 
 import bgu.spl171.net.impl.rci.ObjectEncoderDecoder;
@@ -26,3 +27,4 @@ public class NewsFeedServerMain {
 
     }
 }
+*/
