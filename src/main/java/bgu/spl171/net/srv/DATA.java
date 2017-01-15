@@ -4,17 +4,20 @@ import java.nio.ByteBuffer;
 
 public class DATA extends Packet{
 	public short packetSize;
-	private byte[] PS = new byte[2];
+	private byte[] PS ;
 	public short blockNum;
-	private byte[] BL = new byte[2];
+	private byte[] BL;
 	public byte[] data;
-	private int byteCounter = 0;
+	private int byteCounter;
 
 	public DATA(short opCode) {
 		super(opCode);
 		this.packetSize=0;
 		this.blockNum=0;
-		this.data=null;
+		data=new byte[512];
+		BL = new byte[2];
+		PS= new byte[2];
+		byteCounter=0;
 	}
 
 	public DATA(short opCode,short packetSize, short blockNum, byte[] data) {
@@ -22,13 +25,17 @@ public class DATA extends Packet{
 		this.packetSize=packetSize;
 		this.blockNum=blockNum;
 		this.data=data;
+		//this.data=new byte[512];
+		BL = new byte[2];
+		PS= new byte[2];
+		byteCounter=0;
 	}
 
 	protected byte[] encode(){
 		
 		byte[] BOpcode = shortToBytes(Opcode);
-		byte[] BpacketSize = ByteBuffer.allocate(4).putInt(packetSize).array();
-		byte[] Bblock = ByteBuffer.allocate(4).putInt(blockNum).array();
+		byte[] BpacketSize = ByteBuffer.allocate(2).putShort(packetSize).array();
+		byte[] Bblock = ByteBuffer.allocate(2).putShort(blockNum).array();
 		byte[] ans = new byte[BOpcode.length + BpacketSize.length + Bblock.length + data.length];
 		
 		for (int i=0; i<BOpcode.length; i++){
@@ -73,8 +80,11 @@ public class DATA extends Packet{
 		else{
 			data[this.byteCounter - 4] = nextByte;
 			byteCounter++;
-			if (byteCounter - 4 == packetSize) return this;
-			else return null;			
+			if (byteCounter - 4 == packetSize) {
+				setFinished();
+				return this;
+			}
+			else return null;
 		}
 	}
 }

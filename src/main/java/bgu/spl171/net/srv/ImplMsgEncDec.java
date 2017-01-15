@@ -4,16 +4,16 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 	private int byteCounter = 0;
 	private byte[] findOpcode = new byte[2];
 	private short Opcode;
-	private Packet packet; 
+	private Packet packet;
 	
 	@Override
 	public Packet decodeNextByte(byte nextByte) {
-		
+
 		//------------- המצב שעוד לא יודעים איזה פאקט זה -------------
 		if(byteCounter == 0){
 			findOpcode[0] = nextByte;
 			byteCounter++;
-			return null; 
+		//	return null;
 		}
 		
 		//------------- יצירת האופקוד / שליחת הבייט הנוכחי ל... -------------
@@ -22,50 +22,61 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 			byteCounter++;
 			Opcode = bytesToShort(findOpcode);
 			switch (Opcode){
-				case(1):{
+				case((short)1):{
 					packet = new RRQandWRQ(Opcode);
 					break;
 				}
-				case(2):{
+				case((short)2):{
 					packet = new RRQandWRQ(Opcode);
 					break;
 				}
-				case(3):{
+				case((short)3):{
 					packet = new DATA(Opcode);
 					break;
 				}
-				case(4):{
+				case((short)4):{
 					packet = new ACK(Opcode);
 					break;
 				}
-				case(5):{
+				case((short)5):{
 					packet = new ERROR(Opcode);
 					break;
 				}
-				case(6): {
+				case((short)6): {
 					packet = new DIRQ(Opcode);
 					break;
 				}
-				case(7):{
+				case((short)7):{
 					packet = new LOGRQ(Opcode);
 					break;
 				}
-				case(8):{
+				case((short)8):{
 					packet = new DELRQ(Opcode);
 					break;
 				}
-				case(9):{
+				case((short)9):{
 					packet = new BCAST(Opcode);
 					break;
 				}
-				case(10): {
+				case((short)10): {
 					packet = new DISC(Opcode);
 					break;
 				}
 			}
 			return packet;
-		}	
-		else return packet.decode(nextByte);	 
+		}
+		else {
+			byteCounter++;
+			 packet.decode(nextByte);
+		}
+
+		if(packet!=null&&packet.isFinished()) {
+			Packet ans=packet;
+			packet=null;
+				byteCounter = 0;
+				return ans;
+		}
+		return packet;
 	}
 	
 
@@ -76,7 +87,7 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 			case(2): return ((RRQandWRQ)message).encode();
 			case(3): return ((DATA)message).encode();
 			case(4): return ((ACK)message).encode();
-			case(5): return ((ERROR)message).encode();
+ 		case(5): return ((ERROR)message).encode();
 			case(6): return ((DIRQ)message).encode();
 			case(7): return ((LOGRQ)message).encode();
 			case(8): return ((DELRQ)message).encode();

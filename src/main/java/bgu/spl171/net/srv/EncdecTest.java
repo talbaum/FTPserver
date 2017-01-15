@@ -16,28 +16,28 @@ public class EncdecTest {
  //               3. Remove the "//" from the packet you want to test, and run it.
  //                  You can activate decode and then encode in order to see that you receive the same output as you started.
  //               *. Some of the tests are not relevant - You need to encode just: data, ack, bcast, and error. 
- // testRRQDecode(encdec); // 1
-	//	testRRQEncode(encdec);
-  // testWRQDecode(encdec); // 2
-//		testWRQEncode(encdec);
- //    testDataDecode(encdec); // 3
-//	testDataEncode(encdec); // 3                 -need to check this one!
-//	testACKDecode(encdec); // 4
-//	testACKEncode(encdec); // 4            -                problem
-//	testErrorDecode(encdec); // 5
-//	testErrorEncode(encdec); // 5
-	//	testDIRQDecode(encdec); // 6
-	//	testDIRQEncode(encdec); // 6
+  testRRQDecode(encdec); // 1
+		testRRQEncode(encdec);
+  testWRQDecode(encdec); // 2
+		testWRQEncode(encdec);
+  testDataDecode(encdec); // 3
+	testDataEncode(encdec); // 3
+testACKDecode(encdec); // 4
+	testACKEncode(encdec); // 4            -                problem
+	testErrorDecode(encdec); // 5
+	testErrorEncode(encdec); // 5
+		testDIRQDecode(encdec); // 6
+		testDIRQEncode(encdec); // 6
  	//testLOGRQDecode(encdec); // 7
-	//	 testLOGRQEncode(encdec);
-		//testDELRQDecode(encdec); // 8
-		//testDELRQEncode(encdec); // 8
-		//testBCastDecode(encdec); // 9
-	//testBCastEncode(encdec); // 9
-	//testDISCDecode(encdec); // 10
-		// testDISCEncode(encdec);
-		//testBIGDataDecode(encdec);
-		//testBIGDataEncode(encdec);
+		 testLOGRQEncode(encdec);
+//		testDELRQDecode(encdec); // 8
+		testDELRQEncode(encdec); // 8
+//		testBCastDecode(encdec); // 9
+	testBCastEncode(encdec); // 9
+	testDISCDecode(encdec); // 10
+		 testDISCEncode(encdec);
+		testBIGDataDecode(encdec);
+		testBIGDataEncode(encdec);
 	}
 
 	public static void testBIGDataDecode (ImplMsgEncDec encdec){
@@ -93,6 +93,7 @@ public class EncdecTest {
 		printArr(b);
 		for (int i=0; i<b.length; i++)
 			res=encdec.decodeNextByte(b[i]);
+
 		short opcode=res.getOpcode();
 		short packetSize=((DATA)res).packetSize;
 		short blockNum=((DATA)res).blockNum;
@@ -291,7 +292,7 @@ public class EncdecTest {
 		for (int i=0; i<b.length; i++)
 			res=encdec.decodeNextByte(b[i]);
 		short opcode=((RRQandWRQ)res).getOpcode();
-		String fileName=((RRQandWRQ)res).getFileName();
+		String fileName=((RRQandWRQ)res).Filename;
 		System.out.println("After decoding the arr, we've got a packet!");
 		System.out.println("The opcode is " + opcode +" and the fileName is " + fileName);
 	}

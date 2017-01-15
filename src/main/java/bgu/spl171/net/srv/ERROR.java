@@ -63,6 +63,7 @@ public class ERROR extends Packet{
 					byteString[i] = byteVector.get(i);
 				}
 				this.errMsg = new String(byteString, StandardCharsets.UTF_8);
+				setFinished();
 				return this;
 			}
 		}

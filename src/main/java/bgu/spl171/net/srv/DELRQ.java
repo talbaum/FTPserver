@@ -47,6 +47,7 @@ public class DELRQ extends Packet{
 				byteString[i] = byteVector.get(i);
 			}
 			this.filename = new String(byteString, StandardCharsets.UTF_8);
+			setFinished();
 			return this;
 		}
 	}

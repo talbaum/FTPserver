@@ -14,6 +14,7 @@ public class DIRQ extends Packet{
 
 	@Override
 	protected Packet decode(byte nextByte) {		
+		setFinished();
 		return null;
 	}
 

@@ -4,15 +4,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 public class RRQandWRQ extends Packet{
-	private String Filename;
-	private Vector<Byte> byteVector = new Vector<>();
+	public String Filename;
+	private Vector<Byte> byteVector;
 
 	public RRQandWRQ(short opcode) {
 		super(opcode);
+		this.byteVector= new Vector<>();
+		Filename="";
+
 	}
 
     public RRQandWRQ(short opcode, String filename) {
         super(opcode);
+        this.byteVector= new Vector<>();
         this.Filename=filename;
     }
 
@@ -31,7 +35,6 @@ public class RRQandWRQ extends Packet{
 		}
 		
 		ans[ans.length-1] = '\0';
-		
 		return ans;
 	}
 
@@ -47,6 +50,7 @@ public class RRQandWRQ extends Packet{
 				byteString[i] = byteVector.get(i);
 			}
 			this.Filename = new String(byteString, StandardCharsets.UTF_8);
+			setFinished();
 			return this;
 		}
 	}

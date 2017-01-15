@@ -15,6 +15,7 @@ public class DISC extends Packet{
 
 	@Override
 	protected Packet decode(byte nextByte) {
+		setFinished();
 		return null;
 	}
 	

@@ -60,6 +60,7 @@ public class BCAST extends Packet{
 					byteString[i] = byteVector.get(i);
 				}
 				this.Filename = new String(byteString, StandardCharsets.UTF_8);
+				setFinished();
 				return this;
 			}
 		}
