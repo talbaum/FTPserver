@@ -63,12 +63,16 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 					break;
 				}
 			}
-			return packet;
+			//return packet;
 		}
 		else {
 			byteCounter++;
-			 packet.decode(nextByte);
-		}
+			if (packet != null)
+				packet.decode(nextByte);
+			}
+
+		if(byteCounter==2 && ((Opcode==(short)6) || Opcode==((short)10)))
+			packet.setFinished();
 
 		if(packet!=null&&packet.isFinished()) {
 			Packet ans=packet;
@@ -87,7 +91,7 @@ public class ImplMsgEncDec implements MessageEncoderDecoder<Packet>{
 			case(2): return ((RRQandWRQ)message).encode();
 			case(3): return ((DATA)message).encode();
 			case(4): return ((ACK)message).encode();
- 		case(5): return ((ERROR)message).encode();
+ 			case(5): return ((ERROR)message).encode();
 			case(6): return ((DIRQ)message).encode();
 			case(7): return ((LOGRQ)message).encode();
 			case(8): return ((DELRQ)message).encode();

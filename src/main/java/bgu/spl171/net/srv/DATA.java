@@ -77,14 +77,20 @@ public class DATA extends Packet{
 			this.byteCounter++;
 			return null;
 		}
-		else{
-			data[this.byteCounter - 4] = nextByte;
-			byteCounter++;
-			if (byteCounter - 4 == packetSize) {
-				setFinished();
-				return this;
+		else {
+			try {
+
+				data[this.byteCounter - 4] = nextByte;
+				byteCounter++;
+				if (byteCounter - 4 == packetSize) {
+					setFinished();
+					return this;
+				} else return null;
 			}
-			else return null;
+			catch (ArrayIndexOutOfBoundsException e){
+				return null;
+			}
 		}
+
 	}
 }

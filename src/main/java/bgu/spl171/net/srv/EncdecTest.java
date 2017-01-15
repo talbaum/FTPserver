@@ -23,16 +23,16 @@ public class EncdecTest {
   testDataDecode(encdec); // 3
 	testDataEncode(encdec); // 3
 testACKDecode(encdec); // 4
-	testACKEncode(encdec); // 4            -                problem
-	testErrorDecode(encdec); // 5
+	testACKEncode(encdec); // 4
+		 	testErrorDecode(encdec); // 5
 	testErrorEncode(encdec); // 5
 		testDIRQDecode(encdec); // 6
 		testDIRQEncode(encdec); // 6
- 	//testLOGRQDecode(encdec); // 7
+ 	testLOGRQDecode(encdec); // 7
 		 testLOGRQEncode(encdec);
-//		testDELRQDecode(encdec); // 8
+		testDELRQDecode(encdec); // 8
 		testDELRQEncode(encdec); // 8
-//		testBCastDecode(encdec); // 9
+		testBCastDecode(encdec); // 9
 	testBCastEncode(encdec); // 9
 	testDISCDecode(encdec); // 10
 		 testDISCEncode(encdec);
