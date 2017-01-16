@@ -7,30 +7,30 @@ import java.nio.ByteBuffer;
 public class ACK extends Packet{
 	private byte[] arr = new byte[2];
 	public short block;
-	private int countMyBytes;
+	private int countMyBytesACK;
 
 	public ACK(short opcode) {
 		super(opcode);
 		block=0;// make sure
-		countMyBytes=0;//make sure
+        countMyBytesACK=0;//make sure
 	}
 
 	public ACK(short opcode, short block) {
 		super(opcode);
 		this.block=block;
-		countMyBytes=0; //make sure
+        countMyBytesACK=0; //make sure
 	}
 
 	protected byte[] encode(){
-		byte[] opcodeBytes = shortToBytes(opcode);
-		byte[] blockBytes = ByteBuffer.allocate(2).putShort(block).array();
-		byte[] ans = new byte[opcodeBytes.length + blockBytes.length];
+		byte[] opcodeBytes=shortToBytes(opcode);
+		byte[] blockBytes=ByteBuffer.allocate(2).putShort(block).array();
+		byte[] ans=new byte[opcodeBytes.length + blockBytes.length];
 		
-		for (int i=0; i<opcodeBytes.length; i++){
+		for (int i=0;i<opcodeBytes.length;i++){
 			ans[i]=opcodeBytes[i];
 		}
 		
-		for (int i=0; i<blockBytes.length; i++){
+		for (int i=0;i<blockBytes.length;i++){
 			ans[i+blockBytes.length]=blockBytes[i];
 		}
 		return ans;
@@ -39,11 +39,11 @@ public class ACK extends Packet{
 	@Override
 	protected Packet decode(byte nextByte) {
 
-		arr[this.countMyBytes] = nextByte;
-		this.countMyBytes++;
+		arr[countMyBytesACK]=nextByte;
+        countMyBytesACK++;
 
-		if (this.countMyBytes == 2){
-			block = bytesToShort(arr);
+		if (countMyBytesACK==2){
+			block=bytesToShort(arr);
 			setFinished();
 			return this;
 		}

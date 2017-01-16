@@ -5,59 +5,54 @@ import java.util.Vector;
 /**
  * Created by baum on 10/01/2017.
  */
-public class RRQandWRQ extends Packet{
-	public String Filename;
-	private Vector<Byte> byteVector;
+public class RRQandWRQ extends Packet {
+	public String filename;
+	private Vector<Byte> byteVec;
 
 	public RRQandWRQ(short opcode) {
 		super(opcode);
-		this.byteVector= new Vector<>();
-		Filename="";
-
+		this.byteVec = new Vector<>();
+		this.filename = "";
 	}
 
-    public RRQandWRQ(short opcode, String filename) {
-        super(opcode);
-        this.byteVector= new Vector<>();
-        this.Filename=filename;
-    }
+	public RRQandWRQ(short opcode, String filename) {
+		super(opcode);
+		this.byteVec = new Vector<>();
+		this.filename = filename;
+	}
 
-    protected byte[] encode(){
-		
-		byte[] BOpcode = shortToBytes(opcode);
-		byte[] BFL = Filename.getBytes();
-		byte[] ans = new byte[BOpcode.length + BFL.length + 1];
-		
-		for (int i=0; i<BOpcode.length; i++){
-			ans[i] = BOpcode[i];
+	protected byte[] encode() {
+		byte[] opcodeBytes = shortToBytes(opcode);
+		byte[] filenameBytes = filename.getBytes();
+		byte[] ans = new byte[opcodeBytes.length + filenameBytes.length + 1];
+
+		for (int i = 0; i < opcodeBytes.length; i++) {
+			ans[i] = opcodeBytes[i];
 		}
-		
-		for (int i=0; i<BFL.length; i++){
-			ans[BOpcode.length + i] = BFL[i];
+		for (int i = 0; i < filenameBytes.length; i++) {
+			ans[i + opcodeBytes.length] = filenameBytes[i];
 		}
-		
-		ans[ans.length-1] = '\0';
+		ans[ans.length - 1] = '\0';
 		return ans;
 	}
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (nextByte != '\0'){
-			byteVector.add(nextByte);
+		if (nextByte != '\0') {
+			byteVec.add(nextByte);
 			return null;
-		}
-		else {
-			byte[] byteString = new byte[byteVector.size()];
-			for (int i=0; i<byteString.length; i++){
-				byteString[i] = byteVector.get(i);
+		} else {
+			byte[] myStr = new byte[byteVec.size()];
+			for (int i = 0; i < myStr.length; i++) {
+				myStr[i] = byteVec.get(i);
 			}
-			this.Filename = new String(byteString, StandardCharsets.UTF_8);
+			this.filename = new String(myStr, StandardCharsets.UTF_8);
 			setFinished();
 			return this;
 		}
 	}
+
 	public String getFileName() {
-		return Filename;
+		return filename;
 	}
-	
 }

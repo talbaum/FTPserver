@@ -9,7 +9,7 @@ public class DATA extends Packet{
 	public byte[] data;
 	private byte[] sizeBytes ;
 	private byte[] blockBytes;
-	private int countMyBytes;
+	private int countMyBytesData;
 
 	public DATA(short opCode) {
 		super(opCode);
@@ -18,7 +18,7 @@ public class DATA extends Packet{
 		data=new byte[512];
 		blockBytes = new byte[2];
 		sizeBytes= new byte[2];
-		countMyBytes=0;
+		countMyBytesData=0;
 	}
 
 	public DATA(short opCode,short packetSize, short blockNum, byte[] data) {
@@ -26,27 +26,27 @@ public class DATA extends Packet{
 		this.packetSize=packetSize;
 		this.blockNum=blockNum;
 		this.data=data;
-		blockBytes = new byte[2];
-		sizeBytes= new byte[2];
-		countMyBytes=0;
+		blockBytes=new byte[2];
+		sizeBytes=new byte[2];
+		countMyBytesData=0;
 	}
 
 	protected byte[] encode(){
-		byte[] opcodeBytes = shortToBytes(opcode);
-		byte[] blockBytes = ByteBuffer.allocate(2).putShort(blockNum).array();
-		byte[] packetBytes = ByteBuffer.allocate(2).putShort(packetSize).array();
-		byte[] ans = new byte[opcodeBytes.length + packetBytes.length + blockBytes.length + data.length];
+		byte[] opcodeBytes=shortToBytes(opcode);
+		byte[] blockBytes=ByteBuffer.allocate(2).putShort(blockNum).array();
+		byte[] packetBytes=ByteBuffer.allocate(2).putShort(packetSize).array();
+		byte[] ans=new byte[opcodeBytes.length + packetBytes.length + blockBytes.length + data.length];
 		
-		for (int i=0; i<opcodeBytes.length; i++){
+		for (int i=0;i<opcodeBytes.length;i++){
 			ans[i]=opcodeBytes[i];
 		}
-		for (int i=0; i<packetBytes.length; i++){
+		for (int i=0;i<packetBytes.length;i++){
 			ans[i+opcodeBytes.length]=packetBytes[i];
 		}
-		for (int i=0; i<blockBytes.length; i++){
+		for (int i=0;i<blockBytes.length;i++){
 			ans[opcodeBytes.length+packetBytes.length+i]=blockBytes[i];
 		}
-		for (int i=0; i<data.length; i++){
+		for (int i=0;i<data.length;i++){
 			ans[opcodeBytes.length+packetBytes.length+blockBytes.length+i]=data[i];
 		}
 		return ans;
@@ -54,31 +54,31 @@ public class DATA extends Packet{
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (countMyBytes<2){
-			sizeBytes[countMyBytes]=nextByte;
-			countMyBytes++;
+		if (countMyBytesData==0||countMyBytesData==1){
+			sizeBytes[countMyBytesData]=nextByte;
+			countMyBytesData++;
 			return null;
 		}
 		else
-			if (countMyBytes == 2){
-			packetSize = bytesToShort(sizeBytes);
-			data = new byte[packetSize];
-			countMyBytes++;
-			blockBytes[0] = nextByte;
+			if (countMyBytesData==2){
+			packetSize=bytesToShort(sizeBytes);
+			data=new byte[packetSize];
+			countMyBytesData++;
+			blockBytes[0]=nextByte;
 			return null;
 		}
 		else
-			if (countMyBytes == 3){
-			blockNum = bytesToShort(blockBytes);
-			countMyBytes++;
-			blockBytes[1] = nextByte;
+			if (countMyBytesData==3){
+			blockNum=bytesToShort(blockBytes);
+			countMyBytesData++;
+			blockBytes[1]=nextByte;
 			return null;
 		}
 		else {
 			try {
-				data[countMyBytes-4]=nextByte;
-				countMyBytes++;
-				if (countMyBytes-4==packetSize) {
+				data[countMyBytesData-4]=nextByte;
+				countMyBytesData++;
+				if (countMyBytesData-4==packetSize) {
 					setFinished();
 					return this;
 				} else

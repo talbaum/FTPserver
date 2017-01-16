@@ -292,7 +292,7 @@ testACKDecode(encdec); // 4
 		for (int i=0; i<b.length; i++)
 			res=encdec.decodeNextByte(b[i]);
 		short opcode=((RRQandWRQ)res).getOpcode();
-		String fileName=((RRQandWRQ)res).Filename;
+		String fileName=((RRQandWRQ)res).filename;
 		System.out.println("After decoding the arr, we've got a packet!");
 		System.out.println("The opcode is " + opcode +" and the fileName is " + fileName);
 	}

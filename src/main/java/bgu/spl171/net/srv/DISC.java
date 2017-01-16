@@ -6,10 +6,8 @@ public class DISC extends Packet{
 	public DISC(short opcode) {
 		super(opcode);
 	}
-
 	protected byte[] encode(){
-		
-		byte[] ans = shortToBytes(opcode);
+		byte[] ans=shortToBytes(opcode);
 		return ans;
 	}
 

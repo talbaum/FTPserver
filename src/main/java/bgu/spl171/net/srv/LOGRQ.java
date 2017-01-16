@@ -1,13 +1,14 @@
 package bgu.spl171.net.srv;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Vector;
+import java.nio.charset.StandardCharsets;
+
 /**
  * Created by baum on 10/01/2017.
  */
 public class LOGRQ extends Packet{
 	public String username;
-	private Vector<Byte> byteVector = new Vector<>();
+	private Vector<Byte> byteVec = new Vector<>();
 
 	public LOGRQ(short opcode) {
 		super(opcode);
@@ -19,36 +20,31 @@ public class LOGRQ extends Packet{
     }
 
     protected byte[] encode(){
-		
-		byte[] BOpcode = shortToBytes(opcode);
-		byte[] BFL = username.getBytes();
-		byte[] ans = new byte[BOpcode.length + BFL.length + 1];
-		
-		for (int i=0; i<BOpcode.length; i++){
-			ans[i] = BOpcode[i];
+		byte[] opcodeBytes=shortToBytes(opcode);
+		byte[] usernameBytes=username.getBytes();
+		byte[] ans = new byte[opcodeBytes.length+usernameBytes.length+1];
+		for (int i=0;i<opcodeBytes.length;i++){
+			ans[i]=opcodeBytes[i];
 		}
-		
-		for (int i=0; i<BFL.length; i++){
-			ans[BOpcode.length + i] = BFL[i];
+		for (int i=0;i<usernameBytes.length;i++){
+			ans[i+opcodeBytes.length]=usernameBytes[i];
 		}
-		
-		ans[ans.length-1] = '\0';
-		
+		ans[ans.length-1]='\0';
 		return ans;
 	}
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (nextByte != '\0'){
-			byteVector.add(nextByte);
+		if (nextByte!='\0'){
+			byteVec.add(nextByte);
 			return null;
 		}
 		else {
-			byte[] byteString = new byte[byteVector.size()];
-			for (int i=0; i<byteString.length; i++){
-				byteString[i] = byteVector.get(i);
+			byte[] myStr=new byte[byteVec.size()];
+			for (int i=0;i<myStr.length;i++){
+				myStr[i]=byteVec.get(i);
 			}
-			this.username = new String(byteString, StandardCharsets.UTF_8);
+			this.username=new String(myStr, StandardCharsets.UTF_8);
 			setFinished();
 			return this;
 		}

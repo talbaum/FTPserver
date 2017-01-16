@@ -7,64 +7,61 @@ import java.util.Vector;
  */
 public class ERROR extends Packet{
 	public short errorCode;
-	private byte[] EC = new byte[2];
 	public String errMsg;
+	private int countMyBytesErr=0;
+	private byte[] myError = new byte[2];
 	private Vector<Byte> byteVector = new Vector<>();
-	private int byteCounter = 0;
 
 	public ERROR(short opcode) {
 		super(opcode);
+		this.countMyBytesErr=0;
 	}
 
     public ERROR(short opcode, short errorCode, String errorMsg) {
         super(opcode);
         this.errorCode=errorCode;
         this.errMsg=errorMsg;
+		this.countMyBytesErr=0;
     }
 
     protected byte[] encode(){
-		
-		byte[] BOpcode = shortToBytes(opcode);
-		byte[] BerrorCode = shortToBytes(errorCode);
-		byte[] BerrMsg = errMsg.getBytes();
-		byte[] ans = new byte[BOpcode.length + BerrorCode.length + BerrMsg.length + 1];
-		
-		for (int i=0; i<BOpcode.length; i++){
-			ans[i] = BOpcode[i];
+		byte[] opcodeBytes=shortToBytes(opcode);
+		byte[] errCodeBytes=shortToBytes(errorCode);
+		byte[] errMsgBytes=errMsg.getBytes();
+		byte[] ans=new byte[opcodeBytes.length+errCodeBytes.length+errMsgBytes.length+1];
+		for (int i=0;i<opcodeBytes.length;i++){
+			ans[i]=opcodeBytes[i];
 		}
-		
-		for (int i=0; i<BerrorCode.length; i++){
-			ans[BOpcode.length + i] = BerrorCode[i];
+		for (int i=0; i<errCodeBytes.length; i++){
+			ans[i+opcodeBytes.length]=errCodeBytes[i];
 		}
-		
-		for (int i=0; i<BerrMsg.length; i++){
-			ans[BOpcode.length + BerrorCode.length + i] = BerrMsg[i];
+		for (int i=0;i<errMsgBytes.length;i++){
+			ans[opcodeBytes.length+errCodeBytes.length+i]=errMsgBytes[i];
 		}
-		
-		ans[ans.length-1] = '\0';
-		
+		ans[ans.length-1]='\0';
 		return ans;
 	}
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (this.byteCounter < 2){
-			EC[this.byteCounter] = nextByte;
-			this.byteCounter++;
+		if (countMyBytesErr ==0 || countMyBytesErr==1){
+			myError[countMyBytesErr]=nextByte;
+			countMyBytesErr++;
 			return null;
 		}
 		else {
-			if (this.byteCounter == 3) this.errorCode = bytesToShort(EC);
-			if (nextByte != '\0'){
+			if (countMyBytesErr==3)
+				errorCode=bytesToShort(myError);
+			if (nextByte!='\0'){
 				byteVector.add(nextByte);
 				return null;
 			}
 			else {
-				byte[] byteString = new byte[byteVector.size()];
-				for (int i=0; i<byteString.length; i++){
-					byteString[i] = byteVector.get(i);
+				byte[] byteString=new byte[byteVector.size()];
+				for (int i=0;i<byteString.length;i++){
+					byteString[i]=byteVector.get(i);
 				}
-				this.errMsg = new String(byteString, StandardCharsets.UTF_8);
+				errMsg=new String(byteString, StandardCharsets.UTF_8);
 				setFinished();
 				return this;
 			}
