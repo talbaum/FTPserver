@@ -1,11 +1,11 @@
 package bgu.spl171.net.srv;
 
 abstract public class Packet{
-	short Opcode;
+	short opcode;
 	boolean isFinished;
 
 	public Packet(short opcode){
-		this.Opcode=opcode;
+		this.opcode=opcode;
 		isFinished=false;
 	}
 	public byte[] shortToBytes(short num)
@@ -25,7 +25,7 @@ abstract public class Packet{
 	    return result;
 	}
 	public short getOpcode(){
-		return this.Opcode;
+		return this.opcode;
 	}
 
 	public boolean isFinished(){

@@ -4,10 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 public class BCAST extends Packet{
+	public String filename;
 	public byte deleteOrAdd;
-	public String Filename;
-	private int byteCounter = 0;
-	private Vector<Byte> byteVector = new Vector<>();
+	private int byteCount = 0;
+	private Vector<Byte> byteVec = new Vector<>();
 
 
 	public BCAST(short opcode) {
@@ -17,14 +17,14 @@ public class BCAST extends Packet{
 	public BCAST(short opcode, byte deleteOrAdd, String broadcastMe) {
 		super(opcode);
 		this.deleteOrAdd=deleteOrAdd;
-		this.Filename=broadcastMe;
+		this.filename=broadcastMe;
 	}
 
 
 	protected byte[] encode(){
 		
-		byte[] BOpcode = shortToBytes(Opcode);
-		byte[] BFL = Filename.getBytes();
+		byte[] BOpcode = shortToBytes(opcode);
+		byte[] BFL = filename.getBytes();
 		byte[] ans = new byte[BOpcode.length + BFL.length + 2];
 		
 		for (int i=0; i<BOpcode.length; i++){
@@ -44,22 +44,22 @@ public class BCAST extends Packet{
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (this.byteCounter == 0){
+		if (this.byteCount== 0){
 			this.deleteOrAdd = nextByte;
-			this.byteCounter++;
+			this.byteCount++;
 			return null;
 		}
 		else{			
 			if (nextByte != '\0'){
-				byteVector.add(nextByte);
+				byteVec.add(nextByte);
 				return null;
 			}
 			else {
-				byte[] byteString = new byte[byteVector.size()];
+				byte[] byteString = new byte[byteVec.size()];
 				for (int i=0; i<byteString.length; i++){
-					byteString[i] = byteVector.get(i);
+					byteString[i] = byteVec.get(i);
 				}
-				this.Filename = new String(byteString, StandardCharsets.UTF_8);
+				this.filename = new String(byteString, StandardCharsets.UTF_8);
 				setFinished();
 				return this;
 			}
