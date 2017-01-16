@@ -20,8 +20,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     final LinkedList<Byte> EMPTYLIST = new LinkedList<>();
     boolean isBcast = false;
     boolean isLogged;
+    boolean firstWriteFlag=true;
     String fileToWrite;
     int readBlockingCount=0;
+    int writeBlockingCount=0;
+    boolean writeHasFinished=false;
 
     @Override
     public void start(int connectionId, Connections<T> connections) {
@@ -161,20 +164,39 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private byte[] WRQhandle(Packet tmp) {
         fileToWrite = ((RRQandWRQ) tmp).getFileName();
         if (!files.containsKey(fileToWrite)) {
-            if (byteToFile(((RRQandWRQ) tmp).encode())) { //need to make sure that
+
+            if (firstWriteFlag) {
                 files.put(fileToWrite, EMPTYLIST);
+                firstWriteFlag = false;
                 return checkACK(0, false);
-            } else
-                return getError(2, ""); //file cannot be written error
+            }
+            else {
+                byte[] myCurData = ((RRQandWRQ) tmp).data;
+                short myCurSize = (short) myCurData.length;
+                DATA fileData = new DATA((short) 03, myCurSize, (short) writeBlockingCount, myCurData);
+                byte[] ans = DataHandle(fileData);
+
+                if (writeHasFinished) {
+                    connections.send(ID, ans); //send the last ACK to the client
+                    String letAllKnow = fileToWrite + " has completed uploading to the server.";
+                    connections.broadcast(letAllKnow.getBytes());// check if to my client
+                    isBcast = true; //cause of this it wont send it to the client again
+                    writeHasFinished=false;
+                    firstWriteFlag=true;
+                }
+                return ans;
+            }
         } else
             return getError(5, ""); //file already exist
     }
     private byte[] DataHandle(Packet tmp) {
-        String letAllKnow = null;
         byte[] byteArray = ((DATA) tmp).data;
 
         for (int i = 0; i < byteArray.length; i++)
             singleFileData.add(byteArray[i]);
+
+        int tmpCount=writeBlockingCount;
+        writeBlockingCount++;
 
         if (((DATA) tmp).packetSize < 512) {
             files.replace(fileToWrite, EMPTYLIST, singleFileData);
@@ -188,17 +210,17 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
             if (!byteToFile(byteArray)) {
                 return getError(2, ""); //cannot write error
-            } else {
-                letAllKnow = fileToWrite + " has completed uploading to the server.";
+            }
+            else {
+               /* letAllKnow = fileToWrite + " has completed uploading to the server.";
                 connections.broadcast(letAllKnow.getBytes());// check if to my client
-                isBcast=true;
-                return null;
+                isBcast=true;*/
+                //return null;
+                writeHasFinished=true;
+              //  return checkACK(tmpCount,true);
             }
         }
-        if (letAllKnow == null)
-            return checkACK(((DATA) tmp).blockNum, true);
-    else
-        return null;
+            return checkACK(tmpCount, true);
     }
 
     private byte[] AckHandle(Packet tmp) {

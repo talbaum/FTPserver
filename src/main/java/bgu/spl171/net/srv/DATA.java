@@ -49,7 +49,7 @@ public class DATA extends Packet{
 		for (int i=0;i<data.length;i++){
 			ans[opcodeBytes.length+packetBytes.length+blockBytes.length+i]=data[i];
 		}
-		ans[ans.length-1]='\0';
+
 		return ans;
 	}
 

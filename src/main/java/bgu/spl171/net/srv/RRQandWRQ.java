@@ -7,18 +7,28 @@ import java.util.Vector;
  */
 public class RRQandWRQ extends Packet {
 	public String filename;
+	public byte[] data;
 	private Vector<Byte> byteVec;
+
 
 	public RRQandWRQ(short opcode) {
 		super(opcode);
 		this.byteVec = new Vector<>();
 		this.filename = "";
+		this.data=new byte[512];
 	}
-
 	public RRQandWRQ(short opcode, String filename) {
 		super(opcode);
 		this.byteVec = new Vector<>();
 		this.filename = filename;
+		this.data=new byte[512];
+	}
+
+	public RRQandWRQ(short opcode, String filename, DATA packet) {
+		super(opcode);
+		this.byteVec = new Vector<>();
+		this.filename = filename;
+		this.data=packet.data;
 	}
 
 	protected byte[] encode() {
