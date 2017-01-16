@@ -128,9 +128,9 @@ public class Reactor<T> implements Server<T> {
         selector.close();
     }
 public static void main (String [] args){
-    EncodeDecodeIMP ed= new EncodeDecodeIMP();
+    /*EncodeDecodeIMP ed= new EncodeDecodeIMP();
     TFTPprotocol tp = new TFTPprotocol();
     Supplier<BidiMessagingProtocol<T>> sp=
-        Reactor r= new Reactor(2,8888,);
+        Reactor r= new Reactor(2,8888,);*/
 }
 }

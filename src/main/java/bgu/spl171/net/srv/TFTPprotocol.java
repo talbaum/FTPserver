@@ -21,6 +21,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     boolean isBcast = false;
     boolean isLogged;
     String fileToWrite;
+    int readBlockingCount=0;
 
     @Override
     public void start(int connectionId, Connections<T> connections) {
@@ -137,24 +138,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return arr;
     }
 
-    private boolean removeFromFilesFolder(String deleteMe) {
-        try {
-            //check for generic path
-            Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files\\" + deleteMe);
-            Files.delete(p1);
-            return true;
-        } catch (NoSuchFileException x) {
-            System.out.println("no such file or directory");
-            return false;
-        } catch (DirectoryNotEmptyException x) {
-            System.out.println("file is not empty");
-            return false;
-        } catch (IOException x) {
-            System.err.println(x);
-            return false;
-        }
-    }
-
     private byte[] RRQhandle(Packet tmp) {
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
         if (files.containsKey(fileToRead)) {
@@ -162,9 +145,14 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 String letAllKnowRead = fileToRead + " has completed uploading to the server.";
                 connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
                 isBcast=true;
+                readBlockingCount=0;
                 return null;
             } else {
-                return read(fileToRead); //change to good return op code bock
+                byte[] curData= read(fileToRead); //change to good return op code bock
+                short sizeOfData=(short)curData.length;
+                DATA ans= new DATA ((short)03,sizeOfData,(short) readBlockingCount, curData);
+                readBlockingCount++;
+                return ans.encode();
             }
         } else
             return getError(1, ""); //file not found for reading
@@ -233,11 +221,16 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     if (allFilesNames.equals(""))
         return getError(0, "No Files to show");
-    else
-        return allFilesNames.getBytes();
-    }
+    else{
+        byte[]fileNamesBytes= allFilesNames.getBytes();
+        short sizeOfByteArr=(short)fileNamesBytes.length;
 
-    private byte[] LogrqHandle(Packet tmp) {
+        DATA ans= new DATA((short)06, sizeOfByteArr,(short)1,fileNamesBytes);
+            return ans.encode();
+    }
+}
+
+private byte[] LogrqHandle(Packet tmp) {
     String username = ((LOGRQ) tmp).username;
     if (!connections.MyConnections.contains(username)) {
         connections.MyConnections.put(ID, username);
@@ -247,6 +240,23 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return getError(7, ""); //user already logged in
 }
 
+    private boolean removeFromFilesFolder(String deleteMe) {
+        try {
+            //check for generic path
+            Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files\\" + deleteMe);
+            Files.delete(p1);
+            return true;
+        } catch (NoSuchFileException x) {
+            System.out.println("no such file or directory");
+            return false;
+        } catch (DirectoryNotEmptyException x) {
+            System.out.println("file is not empty");
+            return false;
+        } catch (IOException x) {
+            System.err.println(x);
+            return false;
+        }
+    }
     private byte[] DelrqHandle(Packet tmp){
         String filenameToDel = ((DELRQ) tmp).filename;
         if (files.containsKey(filenameToDel)) {
