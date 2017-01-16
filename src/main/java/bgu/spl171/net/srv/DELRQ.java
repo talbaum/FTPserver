@@ -1,8 +1,9 @@
 package bgu.spl171.net.srv;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class DELRQ extends Packet{
 	public String filename;
 	private Vector<Byte> byteVector = new Vector<>();
@@ -17,27 +18,23 @@ public class DELRQ extends Packet{
     }
 
     protected byte[] encode(){
+		byte[] opcodeBytes = shortToBytes(opcode);
+		byte[] filenameBytes = filename.getBytes();
+		byte[] ans = new byte[opcodeBytes.length+filenameBytes.length+1];
 		
-		byte[] BOpcode = shortToBytes(Opcode);
-		byte[] BFL = filename.getBytes();
-		byte[] ans = new byte[BOpcode.length + BFL.length + 1];
-		
-		for (int i=0; i<BOpcode.length; i++){
-			ans[i] = BOpcode[i];
+		for (int i=0; i<opcodeBytes.length; i++){
+			ans[i] = opcodeBytes[i];
 		}
-		
-		for (int i=0; i<BFL.length; i++){
-			ans[BOpcode.length + i] = BFL[i];
+		for (int i=0; i<filenameBytes.length; i++){
+			ans[i+opcodeBytes.length]=filenameBytes[i];
 		}
-		
 		ans[ans.length-1] = '\0';
-		
 		return ans;
 	}
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (nextByte != '\0'){
+		if (nextByte!='\0'){
 			byteVector.add(nextByte);
 			return null;
 		}

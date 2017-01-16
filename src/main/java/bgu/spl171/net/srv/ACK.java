@@ -1,22 +1,24 @@
 package bgu.spl171.net.srv;
-
 import java.nio.ByteBuffer;
+/**
+ * Created by baum on 10/01/2017.
+ */
 
 public class ACK extends Packet{
-	public short block;
-	private int byteCount;
 	private byte[] arr = new byte[2];
+	public short block;
+	private int countMyBytes;
 
 	public ACK(short opcode) {
 		super(opcode);
 		block=0;// make sure
-		byteCount=0;//make sure
+		countMyBytes=0;//make sure
 	}
 
 	public ACK(short opcode, short block) {
 		super(opcode);
 		this.block=block;
-		byteCount=0; //make sure
+		countMyBytes=0; //make sure
 	}
 
 	protected byte[] encode(){
@@ -36,10 +38,11 @@ public class ACK extends Packet{
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		arr[this.byteCount] = nextByte;
-		this.byteCount++;
 
-		if (this.byteCount == 2){
+		arr[this.countMyBytes] = nextByte;
+		this.countMyBytes++;
+
+		if (this.countMyBytes == 2){
 			block = bytesToShort(arr);
 			setFinished();
 			return this;

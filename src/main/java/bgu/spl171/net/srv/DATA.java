@@ -1,23 +1,24 @@
 package bgu.spl171.net.srv;
-
 import java.nio.ByteBuffer;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class DATA extends Packet{
 	public short packetSize;
-	private byte[] PS ;
 	public short blockNum;
-	private byte[] BL;
 	public byte[] data;
-	private int byteCounter;
+	private byte[] sizeBytes ;
+	private byte[] blockBytes;
+	private int countMyBytes;
 
 	public DATA(short opCode) {
 		super(opCode);
 		this.packetSize=0;
 		this.blockNum=0;
 		data=new byte[512];
-		BL = new byte[2];
-		PS= new byte[2];
-		byteCounter=0;
+		blockBytes = new byte[2];
+		sizeBytes= new byte[2];
+		countMyBytes=0;
 	}
 
 	public DATA(short opCode,short packetSize, short blockNum, byte[] data) {
@@ -25,72 +26,67 @@ public class DATA extends Packet{
 		this.packetSize=packetSize;
 		this.blockNum=blockNum;
 		this.data=data;
-		//this.data=new byte[512];
-		BL = new byte[2];
-		PS= new byte[2];
-		byteCounter=0;
+		blockBytes = new byte[2];
+		sizeBytes= new byte[2];
+		countMyBytes=0;
 	}
 
 	protected byte[] encode(){
+		byte[] opcodeBytes = shortToBytes(opcode);
+		byte[] blockBytes = ByteBuffer.allocate(2).putShort(blockNum).array();
+		byte[] packetBytes = ByteBuffer.allocate(2).putShort(packetSize).array();
+		byte[] ans = new byte[opcodeBytes.length + packetBytes.length + blockBytes.length + data.length];
 		
-		byte[] BOpcode = shortToBytes(Opcode);
-		byte[] BpacketSize = ByteBuffer.allocate(2).putShort(packetSize).array();
-		byte[] Bblock = ByteBuffer.allocate(2).putShort(blockNum).array();
-		byte[] ans = new byte[BOpcode.length + BpacketSize.length + Bblock.length + data.length];
-		
-		for (int i=0; i<BOpcode.length; i++){
-			ans[i] = BOpcode[i];
+		for (int i=0; i<opcodeBytes.length; i++){
+			ans[i]=opcodeBytes[i];
 		}
-		
-		for (int i=0; i<BpacketSize.length; i++){
-			ans[BOpcode.length + i] = BpacketSize[i];
+		for (int i=0; i<packetBytes.length; i++){
+			ans[i+opcodeBytes.length]=packetBytes[i];
 		}
-		
-		for (int i=0; i<Bblock.length; i++){
-			ans[BOpcode.length + BpacketSize.length + i] = Bblock[i];
+		for (int i=0; i<blockBytes.length; i++){
+			ans[opcodeBytes.length+packetBytes.length+i]=blockBytes[i];
 		}
-		
 		for (int i=0; i<data.length; i++){
-			ans[BOpcode.length + BpacketSize.length + Bblock.length + i] = data[i];
+			ans[opcodeBytes.length+packetBytes.length+blockBytes.length+i]=data[i];
 		}
-		
 		return ans;
 	}
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (this.byteCounter < 2){
-			PS[this.byteCounter] = nextByte;
-			this.byteCounter++;
+		if (countMyBytes<2){
+			sizeBytes[countMyBytes]=nextByte;
+			countMyBytes++;
 			return null;
 		}
-		else if (this.byteCounter == 2){
-			packetSize = bytesToShort(PS);
+		else
+			if (countMyBytes == 2){
+			packetSize = bytesToShort(sizeBytes);
 			data = new byte[packetSize];
-			BL[0] = nextByte;
-			this.byteCounter++;
+			countMyBytes++;
+			blockBytes[0] = nextByte;
 			return null;
 		}
-		else if (this.byteCounter == 3){
-			BL[1] = nextByte;
-			blockNum = bytesToShort(BL);
-			this.byteCounter++;
+		else
+			if (countMyBytes == 3){
+			blockNum = bytesToShort(blockBytes);
+			countMyBytes++;
+			blockBytes[1] = nextByte;
 			return null;
 		}
 		else {
 			try {
-
-				data[this.byteCounter - 4] = nextByte;
-				byteCounter++;
-				if (byteCounter - 4 == packetSize) {
+				data[countMyBytes-4]=nextByte;
+				countMyBytes++;
+				if (countMyBytes-4==packetSize) {
 					setFinished();
 					return this;
-				} else return null;
+				} else
+					return null;
 			}
-			catch (ArrayIndexOutOfBoundsException e){
+			catch (Exception e){
 				return null;
 			}
 		}
-
 	}
 }

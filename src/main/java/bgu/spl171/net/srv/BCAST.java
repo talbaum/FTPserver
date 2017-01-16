@@ -2,64 +2,66 @@ package bgu.spl171.net.srv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class BCAST extends Packet{
+
 	public String filename;
 	public byte deleteOrAdd;
-	private int byteCount = 0;
+	private int countMyBytes;
 	private Vector<Byte> byteVec = new Vector<>();
 
 
 	public BCAST(short opcode) {
 		super(opcode);
+		countMyBytes=0;
 	}
 
 	public BCAST(short opcode, byte deleteOrAdd, String broadcastMe) {
 		super(opcode);
-		this.deleteOrAdd=deleteOrAdd;
 		this.filename=broadcastMe;
+		this.deleteOrAdd=deleteOrAdd;
+		countMyBytes=0;
 	}
 
-
 	protected byte[] encode(){
-		
-		byte[] BOpcode = shortToBytes(opcode);
-		byte[] BFL = filename.getBytes();
-		byte[] ans = new byte[BOpcode.length + BFL.length + 2];
-		
-		for (int i=0; i<BOpcode.length; i++){
-			ans[i] = BOpcode[i];
-		}
-		
-		ans[BOpcode.length] = deleteOrAdd;
-		
-		for (int i=0; i<BFL.length; i++){
-			ans[BOpcode.length + 1 + i] = BFL[i];
-		}
-		
-		ans[ans.length - 1] = '\0';
 
+		byte[] opcodeBytes = shortToBytes(opcode);
+		byte[] filenameBytes = filename.getBytes();
+		byte[] ans = new byte[opcodeBytes.length + filenameBytes.length + 2];
+		
+		for (int i=0; i<opcodeBytes.length; i++){
+			ans[i] = opcodeBytes[i];
+		}
+		ans[opcodeBytes.length] = deleteOrAdd;
+
+		for (int i=0; i<filenameBytes.length; i++){
+			ans[opcodeBytes.length+i+1] = filenameBytes[i];
+		}
+		ans[ans.length-1]='\0';
 		return ans;
 	}
 
 	@Override
 	protected Packet decode(byte nextByte) {
-		if (this.byteCount== 0){
+
+		if (this.countMyBytes== 0){
 			this.deleteOrAdd = nextByte;
-			this.byteCount++;
+			this.countMyBytes++;
 			return null;
 		}
 		else{			
-			if (nextByte != '\0'){
+			if (nextByte !='\0'){
 				byteVec.add(nextByte);
 				return null;
 			}
 			else {
-				byte[] byteString = new byte[byteVec.size()];
-				for (int i=0; i<byteString.length; i++){
-					byteString[i] = byteVec.get(i);
+				byte[] myStr = new byte[byteVec.size()];
+				for (int i=0; i<myStr.length; i++){
+					myStr[i] = byteVec.get(i);
 				}
-				this.filename = new String(byteString, StandardCharsets.UTF_8);
+				this.filename = new String(myStr, StandardCharsets.UTF_8);
 				setFinished();
 				return this;
 			}

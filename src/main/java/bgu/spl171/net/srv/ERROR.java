@@ -2,7 +2,9 @@ package bgu.spl171.net.srv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class ERROR extends Packet{
 	public short errorCode;
 	private byte[] EC = new byte[2];
@@ -22,7 +24,7 @@ public class ERROR extends Packet{
 
     protected byte[] encode(){
 		
-		byte[] BOpcode = shortToBytes(Opcode);
+		byte[] BOpcode = shortToBytes(opcode);
 		byte[] BerrorCode = shortToBytes(errorCode);
 		byte[] BerrMsg = errMsg.getBytes();
 		byte[] ans = new byte[BOpcode.length + BerrorCode.length + BerrMsg.length + 1];

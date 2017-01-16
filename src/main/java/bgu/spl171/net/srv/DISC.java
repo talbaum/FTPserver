@@ -1,15 +1,15 @@
 package bgu.spl171.net.srv;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class DISC extends Packet{
-
-
 	public DISC(short opcode) {
 		super(opcode);
 	}
 
 	protected byte[] encode(){
 		
-		byte[] ans = shortToBytes(Opcode);
+		byte[] ans = shortToBytes(opcode);
 		return ans;
 	}
 

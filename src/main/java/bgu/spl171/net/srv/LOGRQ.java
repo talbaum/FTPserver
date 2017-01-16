@@ -2,7 +2,9 @@ package bgu.spl171.net.srv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class LOGRQ extends Packet{
 	public String username;
 	private Vector<Byte> byteVector = new Vector<>();
@@ -18,7 +20,7 @@ public class LOGRQ extends Packet{
 
     protected byte[] encode(){
 		
-		byte[] BOpcode = shortToBytes(Opcode);
+		byte[] BOpcode = shortToBytes(opcode);
 		byte[] BFL = username.getBytes();
 		byte[] ans = new byte[BOpcode.length + BFL.length + 1];
 		

@@ -1,5 +1,7 @@
 package bgu.spl171.net.srv;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class DIRQ extends Packet{
 
 	protected DIRQ(short opcode){
@@ -8,7 +10,7 @@ public class DIRQ extends Packet{
 	
 	protected byte[] encode(){
 		
-		byte[] ans = shortToBytes(Opcode);
+		byte[] ans = shortToBytes(opcode);
 		return ans;
 	}
 

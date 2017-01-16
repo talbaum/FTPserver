@@ -150,7 +150,7 @@ testACKDecode(encdec); // 4
 			res=encdec.decodeNextByte(b[i]);
 		short opcode=res.getOpcode();
 		short deleted_or_added=((BCAST)res).deleteOrAdd;
-		String Filename=((BCAST)res).Filename;
+		String Filename=((BCAST)res).filename;
 		System.out.println("After decoding the arr, we've got a packet!");
 		System.out.println("The opcode is " + opcode + " the deleted_or_added is " + deleted_or_added +"  and the Filename is " + Filename);
 	}
@@ -158,7 +158,7 @@ testACKDecode(encdec); // 4
 	public static void testBCastEncode (EncodeDecodeIMP encdec){
 		BCAST packet = new BCAST(((short)9), (byte) 1, "BCastStr");
 		byte[] res = encdec.encode(packet);
-		System.out.println("Encoding the packet " + packet.getOpcode() + " is the Opcode " + packet.deleteOrAdd + " is the deleted_or_added code " + packet.Filename);
+		System.out.println("Encoding the packet " + packet.getOpcode() + " is the Opcode " + packet.deleteOrAdd + " is the deleted_or_added code " + packet.filename);
 		System.out.print("Output: ");
 
 		printArr(res); // Should be {0,9,1,66,67,97,115,116,83,116,114,0}

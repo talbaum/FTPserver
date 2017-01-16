@@ -2,7 +2,9 @@ package bgu.spl171.net.srv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
-
+/**
+ * Created by baum on 10/01/2017.
+ */
 public class RRQandWRQ extends Packet{
 	public String Filename;
 	private Vector<Byte> byteVector;
@@ -22,7 +24,7 @@ public class RRQandWRQ extends Packet{
 
     protected byte[] encode(){
 		
-		byte[] BOpcode = shortToBytes(Opcode);
+		byte[] BOpcode = shortToBytes(opcode);
 		byte[] BFL = Filename.getBytes();
 		byte[] ans = new byte[BOpcode.length + BFL.length + 1];
 		

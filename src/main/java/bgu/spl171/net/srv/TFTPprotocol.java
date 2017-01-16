@@ -76,6 +76,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     } //need to make sure
 
     private byte[] checkACK(int blockNum, boolean isData) {
+       //change to  byte retrun
         if (!isData)
             return "ACK 0".getBytes();
         else {
@@ -107,7 +108,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     private boolean byteToFile(byte[] tmp) {
         try {
-            FileOutputStream fos = new FileOutputStream("\"C:\\\\Users\\\\באום\\\\Desktop\\\\SPL\\\\Intelij Projects\\\\SPL3\\\\net\\\\src\\\\main\\\\java\\\\bgu\\\\spl171\\\\net\\\\srv\\\\Files\"");
+            FileOutputStream fos = new FileOutputStream("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files");
             fos.write(tmp);
             fos.close();
             return true;
@@ -132,7 +133,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     private boolean removeFromFilesFolder(String deleteMe) {
         try {
-            Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\src\\main\\java\\bgu\\spl171\\net\\srv\\Files\\" + deleteMe);
+            //check for generic path
+            Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files\\" + deleteMe);
             Files.delete(p1);
             return true;
         } catch (NoSuchFileException x) {
@@ -152,10 +154,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         if (files.containsKey(fileToRead)) {
             if (files.get(fileToRead).isEmpty()) {
                 String letAllKnowRead = fileToRead + " has completed uploading to the server.";
-                connections.broadcast(letAllKnowRead.getBytes());
+                connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
                 isBcast=true;
                 return null;
             } else {
+                //change to good return op code bock
                 return read(fileToRead);
             }
         } else
@@ -194,7 +197,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 return getError(2, ""); //cannot write error
             } else {
                 letAllKnow = fileToWrite + " has completed uploading to the server.";
-                connections.broadcast(letAllKnow.getBytes());
+                connections.broadcast(letAllKnow.getBytes());// check if to my client
                 isBcast=true;
                 return null;
             }
@@ -217,6 +220,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     {
         return getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
     }
+
     private byte[] DirqHandle(Packet tmp) {
         String allFilesNames = "";
     for (String nameOfFile : files.keySet()) {
