@@ -3,11 +3,17 @@ import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.Connections;
 
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 /**
  * Created by baum on 10/01/2017.
  */
@@ -21,6 +27,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     boolean isBcast = false;
     boolean isLogged;
     boolean firstWriteFlag=true;
+    boolean firstReadFlag=true;
+    boolean moreDataNeeded;
+    boolean dataGotAck;
     String fileToWrite;
     int readBlockingCount=0;
     int writeBlockingCount=0;
@@ -116,16 +125,18 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return er.encode();
     }
 
-    private boolean byteToFile(byte[] tmp) {
-        try {
-            FileOutputStream fos = new FileOutputStream("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files");
-            fos.write(tmp);
-            fos.close();
+    private boolean byteToFile(byte[] tmp, String name) {
+        Path p = Paths.get("./Files"+name);
+        try (OutputStream out = new BufferedOutputStream(
+                Files.newOutputStream(p, CREATE, APPEND))) {
+            out.write(tmp, 0, tmp.length);
             return true;
-        } catch (Exception e) {
+        } catch (IOException x) {
+            System.err.println(x);
             return false;
         }
     }
+
 
     private byte[] read(String readMe) {
         byte[] arr = new byte[512];
@@ -140,27 +151,47 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
         return arr;
     }
-
-    private byte[] RRQhandle(Packet tmp) {
-        String fileToRead = ((RRQandWRQ) tmp).getFileName();
-        if (files.containsKey(fileToRead)) {
-            if (files.get(fileToRead).isEmpty()) {
-                String letAllKnowRead = fileToRead + " has completed uploading to the server.";
-                connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
-                isBcast=true;
-                readBlockingCount=0;
-                return null;
-            } else {
-                byte[] curData= read(fileToRead); //change to good return op code bock
-                short sizeOfData=(short)curData.length;
-                DATA ans= new DATA ((short)03,sizeOfData,(short) readBlockingCount, curData);
-                readBlockingCount++;
-                return ans.encode();
-            }
-        } else
-            return getError(1, ""); //file not found for reading
+    private byte[] readHelper(String fileToRead){
+        if (files.get(fileToRead).isEmpty()) {
+            String letAllKnowRead = fileToRead + " has completed uploading to the server.";
+            connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
+            isBcast = true;
+            readBlockingCount = 0;
+            moreDataNeeded=false;
+            return null;
+        }
+        else {
+            byte[] curData = read(fileToRead); //change to good return op code bock
+            short sizeOfData = (short) curData.length;
+            DATA ans = new DATA((short) 03, sizeOfData, (short) readBlockingCount, curData);
+            readBlockingCount++;
+            moreDataNeeded=true;
+            return ans.encode();
+        }
     }
 
+    private byte[] RRQhandle(Packet tmp) {
+      byte[]ans=null;
+        String fileToRead = ((RRQandWRQ) tmp).getFileName();
+        if (firstReadFlag) {
+            if (files.containsKey(fileToRead))
+                ans= readHelper(fileToRead);
+            else
+                ans= getError(1, ""); //file not found for reading
+
+            if(ans!=null)
+                firstReadFlag=false;
+            else
+                firstReadFlag=true;
+        }
+        else{
+            if(dataGotAck){
+            dataGotAck=false;
+            ans= readHelper(fileToRead);
+            }
+        }
+        return ans;
+    }
     private byte[] WRQhandle(Packet tmp) {
         fileToWrite = ((RRQandWRQ) tmp).getFileName();
         if (!files.containsKey(fileToWrite)) {
@@ -208,7 +239,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 i++;
             }
 
-            if (!byteToFile(byteArray)) {
+            if (!byteToFile(byteArray,fileToWrite)) {
                 return getError(2, ""); //cannot write error
             }
             else {
@@ -216,7 +247,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 connections.broadcast(letAllKnow.getBytes());// check if to my client
                 isBcast=true;*/
                 //return null;
+
                 writeHasFinished=true;
+
               //  return checkACK(tmpCount,true);
             }
         }
@@ -224,8 +257,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private byte[] AckHandle(Packet tmp) {
-        if (tmp.getOpcode() == 3) {
-            //this is a data block, can send another block of data
+        if (moreDataNeeded) {
+           dataGotAck=true; //this is a data block, can send another block of data
             return checkACK(((DATA) tmp).blockNum, true);
         } else {
             return checkACK(0, false);
@@ -267,6 +300,7 @@ private byte[] LogrqHandle(Packet tmp) {
             //check for generic path
             Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files\\" + deleteMe);
             Files.delete(p1);
+            files.remove(deleteMe);
             return true;
         } catch (NoSuchFileException x) {
             System.out.println("no such file or directory");
