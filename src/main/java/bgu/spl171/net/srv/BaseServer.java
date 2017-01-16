@@ -2,7 +2,6 @@ package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.MessageEncoderDecoder;
-import bgu.spl171.net.api.MessagingProtocol;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

@@ -27,10 +27,10 @@ public class RRQandWRQ extends Packet {
 		byte[] ans = new byte[opcodeBytes.length + filenameBytes.length + 1];
 
 		for (int i = 0; i < opcodeBytes.length; i++) {
-			ans[i] = opcodeBytes[i];
+			ans[i]=opcodeBytes[i];
 		}
 		for (int i = 0; i < filenameBytes.length; i++) {
-			ans[i + opcodeBytes.length] = filenameBytes[i];
+			ans[i+opcodeBytes.length]=filenameBytes[i];
 		}
 		ans[ans.length - 1] = '\0';
 		return ans;

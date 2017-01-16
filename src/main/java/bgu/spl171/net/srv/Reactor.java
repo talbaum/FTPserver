@@ -127,5 +127,10 @@ public class Reactor<T> implements Server<T> {
     public void close() throws IOException {
         selector.close();
     }
-
+public static void main (String [] args){
+    EncodeDecodeIMP ed= new EncodeDecodeIMP();
+    TFTPprotocol tp = new TFTPprotocol();
+    Supplier<BidiMessagingProtocol<T>> sp=
+        Reactor r= new Reactor(2,8888,);
+}
 }

@@ -76,34 +76,40 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     } //need to make sure
 
     private byte[] checkACK(int blockNum, boolean isData) {
-       //change to  byte retrun
-        if (!isData)
-            return "ACK 0".getBytes();
+        if (!isData){
+            ACK ans= new ACK(((short)05), (short) 0);
+            return ans.encode();
+        }
         else {
-            return ("ACK " + blockNum).getBytes();
+            ACK ans= new ACK(((short)05), (short) blockNum);
+            return ans.encode();
         }
     }
 
+
     private byte[] getError(int errorCode, String errorMsg) {
+    short myOp= (short)errorCode;
+    String errorMsg2="No error messege was acquired";
         switch (errorCode) {
-            case 0:
-                return ("Not defined, see error message (if any). " + errorMsg).getBytes();
-            case 1:
-                return ("File not found – RRQ of non-existing file  " + errorMsg).getBytes();
-            case 2:
-                return ("Access violation – File cannot be written, read or deleted.   " + errorMsg).getBytes();
-            case 3:
-                return ("Disk full or allocation exceeded – No room in disk " + errorMsg).getBytes();
-            case 4:
-                return ("Illegal TFTP operation – Unknown Opcode  " + errorMsg).getBytes();
-            case 5:
-                return ("File already exists – File name exists on WRQ.  " + errorMsg).getBytes();
-            case 6:
-                return ("User not logged in – Any opcode received before Login completes.  " + errorMsg).getBytes();
-            case 7:
-                return ("User already logged in – Login username already connected.  " + errorMsg).getBytes();
+            case (short)0:
+                errorMsg2= ("Not defined, see error message (if any). " + errorMsg); break;
+            case (short)1:
+                errorMsg2 =("File not found – RRQ of non-existing file  " + errorMsg); break;
+            case (short)2:
+                errorMsg2= ("Access violation – File cannot be written, read or deleted.   " + errorMsg); break;
+            case (short)3:
+                errorMsg2= ("Disk full or allocation exceeded – No room in disk " + errorMsg);break;
+            case (short)4:
+                errorMsg2= ("Illegal TFTP operation – Unknown Opcode  " + errorMsg);break;
+            case (short)5:
+                errorMsg2= ("File already exists – File name exists on WRQ.  " + errorMsg);break;
+            case (short)6:
+                errorMsg2= ("User not logged in – Any opcode received before Login completes.  " + errorMsg);break;
+            case (short)7:
+                errorMsg2= ("User already logged in – Login username already connected.  " + errorMsg);break;
         }
-        return "".getBytes();
+        ERROR er=new ERROR(myOp,(short)errorCode,errorMsg2);
+        return er.encode();
     }
 
     private boolean byteToFile(byte[] tmp) {
@@ -125,8 +131,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             arr[i] = readedFileBytes.pollFirst();
             i++;
         }
-        if (readedFileBytes.isEmpty())
-            removeFromFilesFolder(readMe);
+     /*   if (readedFileBytes.isEmpty())
+            removeFromFilesFolder(readMe);*/
 
         return arr;
     }
@@ -158,8 +164,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 isBcast=true;
                 return null;
             } else {
-                //change to good return op code bock
-                return read(fileToRead);
+                return read(fileToRead); //change to good return op code bock
             }
         } else
             return getError(1, ""); //file not found for reading
@@ -216,12 +221,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             return checkACK(0, false);
         }
     }
-    private byte[] ErrorHandle(Packet tmp)
-    {
+    private byte[] ErrorHandle(Packet tmp) {
         return getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
     }
 
-    private byte[] DirqHandle(Packet tmp) {
+    private byte[] DirqHandle(Packet tmp) { //switch to good return
         String allFilesNames = "";
     for (String nameOfFile : files.keySet()) {
         allFilesNames += nameOfFile + " \0 ";
@@ -265,5 +269,17 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return checkACK(0, false);
     }
 
-
+    public short bytesToShort(byte[] byteArr)
+    {
+        short result = (short)((byteArr[0] & 0xff) << 8);
+        result += (short)(byteArr[1] & 0xff);
+        return result;
+    }
+    public byte[] shortToBytes(short num)
+    {
+        byte[] bytesArr = new byte[2];
+        bytesArr[0] = (byte)((num >> 8) & 0xFF);
+        bytesArr[1] = (byte)(num & 0xFF);
+        return bytesArr;
+    }
 }
