@@ -16,7 +16,7 @@ abstract public class Packet{
 	    return bytesArr;
 	}
 
-	protected abstract Packet decode(byte nextByte);
+	public abstract Packet decode(byte nextByte);
 	
 	public short bytesToShort(byte[] byteArr)
 	{

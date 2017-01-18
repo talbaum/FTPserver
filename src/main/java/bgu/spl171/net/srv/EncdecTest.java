@@ -1,5 +1,7 @@
 package bgu.spl171.net.srv;
 
+import bgu.spl171.net.api.EncodeDecodeIMP;
+
 import java.nio.charset.StandardCharsets;
 
 public class EncdecTest {

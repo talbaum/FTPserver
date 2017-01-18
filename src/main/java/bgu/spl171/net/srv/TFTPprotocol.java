@@ -23,7 +23,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     ConnectionsImpl connections;
     ConcurrentHashMap<String, LinkedList<Byte>> files = new ConcurrentHashMap<>();
     LinkedList<Byte> singleFileData = new LinkedList<>();
-    final LinkedList<Byte> EMPTYLIST = new LinkedList<>();
     boolean isBcast = false;
     boolean isLogged;
     boolean firstWriteFlag=true;
@@ -99,7 +98,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         }
     }
 
-
     private byte[] getError(int errorCode, String errorMsg) {
     short myOp= (short)errorCode;
     String errorMsg2="No error messege was acquired";
@@ -137,8 +135,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         }
     }
 
-
-    private byte[] read(String readMe) {
+    private byte[] readMaximum512Bytes(String readMe) {
         byte[] arr = new byte[512];
         LinkedList<Byte> readedFileBytes = files.get(readMe);
         int i = 0;
@@ -146,11 +143,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             arr[i] = readedFileBytes.pollFirst();
             i++;
         }
-     /*   if (readedFileBytes.isEmpty())
-            removeFromFilesFolder(readMe);*/
-
         return arr;
     }
+
     private byte[] readHelper(String fileToRead){
         if (files.get(fileToRead).isEmpty()) {
             String letAllKnowRead = fileToRead + " has completed uploading to the server.";
@@ -161,7 +156,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             return null;
         }
         else {
-            byte[] curData = read(fileToRead); //change to good return op code bock
+            byte[] curData = readMaximum512Bytes(fileToRead); //change to good return op code bock
             short sizeOfData = (short) curData.length;
             DATA ans = new DATA((short) 03, sizeOfData, (short) readBlockingCount, curData);
             readBlockingCount++;
@@ -179,7 +174,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             else
                 ans= getError(1, ""); //file not found for reading
 
-            if(ans!=null)
+            if(ans!=null) //means it's an error. initiliaze this for next read
                 firstReadFlag=false;
             else
                 firstReadFlag=true;
@@ -189,6 +184,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             dataGotAck=false;
             ans= readHelper(fileToRead);
             }
+            else{
+                //didn't got more data. need to return error.
+            }
         }
         return ans;
     }
@@ -197,7 +195,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         if (!files.containsKey(fileToWrite)) {
 
             if (firstWriteFlag) {
-                files.put(fileToWrite, EMPTYLIST);
                 firstWriteFlag = false;
                 return checkACK(0, false);
             }
@@ -210,7 +207,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 if (writeHasFinished) {
                     connections.send(ID, ans); //send the last ACK to the client
                     String letAllKnow = fileToWrite + " has completed uploading to the server.";
-                    connections.broadcast(letAllKnow.getBytes());// check if to my client
+                    connections.broadcast(letAllKnow.getBytes());// check if to my client or to everyone
                     isBcast = true; //cause of this it wont send it to the client again
                     writeHasFinished=false;
                     firstWriteFlag=true;
@@ -230,7 +227,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         writeBlockingCount++;
 
         if (((DATA) tmp).packetSize < 512) {
-            files.replace(fileToWrite, EMPTYLIST, singleFileData);
+            files.put(fileToWrite, singleFileData);
             byteArray = new byte[singleFileData.size()];
 
             int i = 0;
@@ -280,7 +277,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         byte[]fileNamesBytes= allFilesNames.getBytes();
         short sizeOfByteArr=(short)fileNamesBytes.length;
 
-        DATA ans= new DATA((short)06, sizeOfByteArr,(short)1,fileNamesBytes);
+        DATA ans= new DATA((short)03, sizeOfByteArr,(short)1,fileNamesBytes);
             return ans.encode();
     }
 }
@@ -325,10 +322,12 @@ private byte[] LogrqHandle(Packet tmp) {
             return getError(1, ""); //file not found
     }
     private byte[] BcastHandle(Packet tmp) {
-        connections.broadcast(((BCAST) tmp).encode());
+
+        connections.broadcast(((BCAST) tmp).encode()); //make sure it's ok
         isBcast = true;
         return null;
     }
+
     private byte[] DiscHandle(Packet tmp) {
         connections.disconnect(ID);
         isLogged = false;

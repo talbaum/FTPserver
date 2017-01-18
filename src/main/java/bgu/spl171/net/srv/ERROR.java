@@ -24,7 +24,7 @@ public class ERROR extends Packet{
 		this.countMyBytesErr=0;
     }
 
-    protected byte[] encode(){
+    public byte[] encode(){
 		byte[] opcodeBytes=shortToBytes(opcode);
 		byte[] errCodeBytes=shortToBytes(errorCode);
 		byte[] errMsgBytes=errMsg.getBytes();
@@ -43,7 +43,7 @@ public class ERROR extends Packet{
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
+	public Packet decode(byte nextByte) {
 		if (countMyBytesErr ==0 || countMyBytesErr==1){
 			myError[countMyBytesErr]=nextByte;
 			countMyBytesErr++;

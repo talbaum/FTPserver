@@ -31,32 +31,32 @@ public class RRQandWRQ extends Packet {
 		this.data=packet.data;
 	}
 
-	protected byte[] encode() {
-		byte[] opcodeBytes = shortToBytes(opcode);
-		byte[] filenameBytes = filename.getBytes();
-		byte[] ans = new byte[opcodeBytes.length + filenameBytes.length + 1];
+	public byte[] encode() {
+		byte[] opcodeBytes=shortToBytes(opcode);
+		byte[] filenameBytes=filename.getBytes();
+		byte[] ans =new byte[opcodeBytes.length+filenameBytes.length+1];
 
-		for (int i = 0; i < opcodeBytes.length; i++) {
+		for (int i=0;i<opcodeBytes.length;i++) {
 			ans[i]=opcodeBytes[i];
 		}
-		for (int i = 0; i < filenameBytes.length; i++) {
+		for (int i=0;i<filenameBytes.length;i++) {
 			ans[i+opcodeBytes.length]=filenameBytes[i];
 		}
-		ans[ans.length - 1] = '\0';
+		ans[ans.length-1]='\0';
 		return ans;
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
-		if (nextByte != '\0') {
+	public Packet decode(byte nextByte) {
+		if (nextByte!='\0') {
 			byteVec.add(nextByte);
 			return null;
 		} else {
-			byte[] myStr = new byte[byteVec.size()];
-			for (int i = 0; i < myStr.length; i++) {
-				myStr[i] = byteVec.get(i);
+			byte[] myStr=new byte[byteVec.size()];
+			for (int i = 0;i<myStr.length;i++) {
+				myStr[i]=byteVec.get(i);
 			}
-			this.filename = new String(myStr, StandardCharsets.UTF_8);
+			this.filename=new String(myStr, StandardCharsets.UTF_8);
 			setFinished();
 			return this;
 		}

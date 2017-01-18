@@ -31,7 +31,7 @@ public class DATA extends Packet{
 		countMyBytesData=0;
 	}
 
-	protected byte[] encode(){
+	public byte[] encode(){
 		byte[] opcodeBytes=shortToBytes(opcode);
 		byte[] blockBytes=ByteBuffer.allocate(2).putShort(blockNum).array();
 		byte[] packetBytes=ByteBuffer.allocate(2).putShort(packetSize).array();
@@ -54,7 +54,7 @@ public class DATA extends Packet{
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
+	public Packet decode(byte nextByte) {
 		if (countMyBytesData==0||countMyBytesData==1){
 			sizeBytes[countMyBytesData]=nextByte;
 			countMyBytesData++;

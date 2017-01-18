@@ -19,7 +19,7 @@ public class LOGRQ extends Packet{
         this.username=username;
     }
 
-    protected byte[] encode(){
+    public byte[] encode(){
 		byte[] opcodeBytes=shortToBytes(opcode);
 		byte[] usernameBytes=username.getBytes();
 		byte[] ans = new byte[opcodeBytes.length+usernameBytes.length+1];
@@ -34,7 +34,7 @@ public class LOGRQ extends Packet{
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
+	public Packet decode(byte nextByte) {
 		if (nextByte!='\0'){
 			byteVec.add(nextByte);
 			return null;

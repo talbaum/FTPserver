@@ -6,13 +6,13 @@ public class DISC extends Packet{
 	public DISC(short opcode) {
 		super(opcode);
 	}
-	protected byte[] encode(){
+	public byte[] encode(){
 		byte[] ans=shortToBytes(opcode);
 		return ans;
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
+	public Packet decode(byte nextByte) {
 		setFinished();
 		return null;
 	}

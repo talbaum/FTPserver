@@ -17,7 +17,7 @@ public class DELRQ extends Packet{
         this.filename=filename;
     }
 
-    protected byte[] encode(){
+    public byte[] encode(){
 		byte[] opcodeBytes=shortToBytes(opcode);
 		byte[] filenameBytes=filename.getBytes();
 		byte[] ans=new byte[opcodeBytes.length+filenameBytes.length+1];
@@ -33,7 +33,7 @@ public class DELRQ extends Packet{
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
+	public Packet decode(byte nextByte) {
 		if (nextByte!='\0'){
 			byteVec.add(nextByte);
 			return null;

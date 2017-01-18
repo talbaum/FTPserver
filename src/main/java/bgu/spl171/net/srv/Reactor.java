@@ -38,8 +38,10 @@ public class Reactor<T> implements Server<T> {
     @Override
     public void serve() {
 	selectorThread = Thread.currentThread();
+        System.out.println("Trying to connect Man...");
         try (Selector selector = Selector.open();
                 ServerSocketChannel serverSock = ServerSocketChannel.open()) {
+
 
             this.selector = selector; //just to be able to close
 
@@ -48,8 +50,8 @@ public class Reactor<T> implements Server<T> {
             serverSock.register(selector, SelectionKey.OP_ACCEPT);
 
             while (!Thread.currentThread().isInterrupted()) {
-
                 selector.select();
+                System.out.println("Connected! Youre the best!");
                 runSelectionThreadTasks();
 
                 for (SelectionKey key : selector.selectedKeys()) {
@@ -64,7 +66,6 @@ public class Reactor<T> implements Server<T> {
                 }
 
                 selector.selectedKeys().clear(); //clear the selected keys set so that we can know about new events
-
             }
 
         } catch (ClosedSelectorException ex) {
@@ -94,6 +95,7 @@ public class Reactor<T> implements Server<T> {
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
         SocketChannel clientChan = serverChan.accept();
         clientChan.configureBlocking(false);
+        //class cast exception from EncoderDecoderImp to MessegeEncoderDecoder
         final NonBlockingConnectionHandler handler = new NonBlockingConnectionHandler(
                 readerFactory.get(),
                 protocolFactory.get(),
@@ -127,10 +129,5 @@ public class Reactor<T> implements Server<T> {
     public void close() throws IOException {
         selector.close();
     }
-public static void main (String [] args){
-    /*EncodeDecodeIMP ed= new EncodeDecodeIMP();
-    TFTPprotocol tp = new TFTPprotocol();
-    Supplier<BidiMessagingProtocol<T>> sp=
-        Reactor r= new Reactor(2,8888,);*/
-}
+
 }

@@ -21,7 +21,7 @@ public class ACK extends Packet{
         countMyBytesACK=0; //make sure
 	}
 
-	protected byte[] encode(){
+	public byte[] encode(){
 		byte[] opcodeBytes=shortToBytes(opcode);
 		byte[] blockBytes=ByteBuffer.allocate(2).putShort(block).array();
 		byte[] ans=new byte[opcodeBytes.length + blockBytes.length+1];
@@ -36,7 +36,7 @@ public class ACK extends Packet{
 	}
 
 	@Override
-	protected Packet decode(byte nextByte) {
+	public Packet decode(byte nextByte) {
 
 		arr[countMyBytesACK]=nextByte;
         countMyBytesACK++;
