@@ -1,6 +1,6 @@
 package bgu.spl171.net.api;
 
-import bgu.spl171.net.srv.*;
+import bgu.spl171.net.packets.*;
 
 public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     private Packet packet;
