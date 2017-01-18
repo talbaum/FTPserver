@@ -38,7 +38,7 @@ public class Reactor<T> implements Server<T> {
     @Override
     public void serve() {
 	selectorThread = Thread.currentThread();
-        System.out.println("Trying to connect Man...");
+
         try (Selector selector = Selector.open();
                 ServerSocketChannel serverSock = ServerSocketChannel.open()) {
 
@@ -49,9 +49,10 @@ public class Reactor<T> implements Server<T> {
             serverSock.configureBlocking(false);
             serverSock.register(selector, SelectionKey.OP_ACCEPT);
 
+            System.out.println("Trying to connect Man...");
             while (!Thread.currentThread().isInterrupted()) {
                 selector.select();
-                System.out.println("Connected! Youre the best!");
+                System.out.println("Operation Recivied!");
                 runSelectionThreadTasks();
 
                 for (SelectionKey key : selector.selectedKeys()) {

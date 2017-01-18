@@ -48,11 +48,14 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
             buf.flip();
             return () -> {
                 try {
+
                     while (buf.hasRemaining()) {
-                        T nextMessage = encdec.decodeNextByte(buf.get());
-                        if (nextMessage != null) {
-                            protocol.process(nextMessage);
-                        }
+                        System.out.println("buff" + buf.toString());
+                            T nextMessage = encdec.decodeNextByte(buf.get());
+                            if (nextMessage != null) {
+                              //  System.out.println("GOOD TO BE HERE");
+                                protocol.process(nextMessage);
+                            }
                     }
                 } finally {
                     releaseBuffer(buf);

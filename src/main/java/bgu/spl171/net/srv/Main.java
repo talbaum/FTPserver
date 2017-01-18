@@ -29,12 +29,17 @@ public class Main {
         //t.serve();
         //t.close();
 */
-        ThreadPerClient s = new ThreadPerClient(8888,()->{return new TFTPprotocol();},()->{return new EncodeDecodeIMP();});
-        s.serve();
-        s.close();
+        Reactor r= new Reactor(2,8888,()->{return new TFTPprotocol();},()->{return new EncodeDecodeIMP();});
+        ThreadPerClient s = new ThreadPerClient(8888, () -> {
+            return new TFTPprotocol();
+        }, () -> {
+            return new EncodeDecodeIMP();
+        });
 
-      /*  Reactor r= new Reactor(2,8888,()->{return new TFTPprotocol();},()->{return new EncodeDecodeIMP();});
+        //s.serve();
+      //  s.close();
         r.serve();
-        r.close();*/
+        r.close();
+
     }
 }

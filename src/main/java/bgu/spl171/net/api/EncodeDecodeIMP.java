@@ -10,15 +10,20 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
 
     @Override
     public Packet decodeNextByte(byte nextByte) {
+
         if(byteCount == 0){
             opArr[0] = nextByte;
             byteCount++;
+            System.out.println("0 first char");
         }
 
         else if(byteCount==1){
             opArr[1] = nextByte;
             byteCount++;
             opcode = bytesToShort(opArr);
+            Short s= new Short(opcode);
+            System.out.println(s.intValue());
+
             switch (opcode){
                 case((short)1):{
                     packet = new RRQandWRQ(opcode);
@@ -45,6 +50,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
                     break;
                 }
                 case((short)7):{
+                    System.out.println("Login User");
                     packet = new LOGRQ(opcode);
                     break;
                 }
