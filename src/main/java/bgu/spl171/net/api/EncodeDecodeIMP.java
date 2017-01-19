@@ -14,7 +14,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
         if(byteCount == 0){
             opArr[0] = nextByte;
             byteCount++;
-            System.out.println("0 first char");
         }
 
         else if(byteCount==1){
@@ -66,9 +65,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
                     packet = new DISC(opcode);
                     break;
                 }
-                default:
-                    System.out.println("bad opcode.");
-                    break;
             }
         }
         else {

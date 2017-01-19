@@ -1,7 +1,7 @@
 package bgu.spl171.net.srv;
 
-import bgu.spl171.net.api.*;
-
+import bgu.spl171.net.api.BidiMessagingProtocol;
+import bgu.spl171.net.api.MessageEncoderDecoder;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ClosedSelectorException;
@@ -19,7 +19,7 @@ public class Reactor<T> implements Server<T> {
     private final Supplier<MessageEncoderDecoder<T>> readerFactory;
     private final ActorThreadPool pool;
     private Selector selector;
-    public ConnectionsImpl<T> connections1;
+
     private Thread selectorThread;
     private final ConcurrentLinkedQueue<Runnable> selectorTasks = new ConcurrentLinkedQueue<>();
 
@@ -33,8 +33,6 @@ public class Reactor<T> implements Server<T> {
         this.port = port;
         this.protocolFactory = protocolFactory;
         this.readerFactory = readerFactory;
-        this.connections1 = new ConnectionsImpl<T>();
-        ((TFTPprotocol<T>)protocolFactory.get()).connections= connections1;
     }
 
     @Override
@@ -104,7 +102,7 @@ public class Reactor<T> implements Server<T> {
                 protocolFactory.get(),
                 clientChan,
                 this);
-        connections1.addConnection(handler);
+
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 
