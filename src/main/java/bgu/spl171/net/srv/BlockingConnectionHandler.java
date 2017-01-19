@@ -1,8 +1,7 @@
 package bgu.spl171.net.srv;
 
-import bgu.spl171.net.api.BidiMessagingProtocol;
-import bgu.spl171.net.api.MessageEncoderDecoder;
-import bgu.spl171.net.api.MessagingProtocol;
+import bgu.spl171.net.api.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -16,11 +15,14 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     private BufferedInputStream in;
     private BufferedOutputStream out;
     private volatile boolean connected = true;
+    private ConnectionsImpl<T> connections;
 
-    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, BidiMessagingProtocol<T> protocol) {
+    public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, BidiMessagingProtocol<T> protocol, ConnectionsImpl<T> cons) {
         this.sock = sock;
         this.encdec = reader;
         this.protocol = protocol;
+        ((TFTPprotocol<T>)this.protocol).connections=cons;
+        this.connections=cons;
     }
 
     @Override

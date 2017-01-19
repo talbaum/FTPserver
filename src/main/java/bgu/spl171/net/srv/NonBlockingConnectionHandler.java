@@ -1,8 +1,6 @@
 package bgu.spl171.net.srv;
 
-import bgu.spl171.net.api.BidiMessagingProtocol;
-import bgu.spl171.net.api.MessageEncoderDecoder;
-import bgu.spl171.net.api.MessagingProtocol;
+import bgu.spl171.net.api.*;
 import bgu.spl171.net.packets.Packet;
 
 import java.io.IOException;
@@ -24,16 +22,19 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private final Queue<ByteBuffer> writeQueue = new ConcurrentLinkedQueue<>();
     private final SocketChannel chan;
     private final Reactor reactor;
+    private ConnectionsImpl<T> cons;
 
     public NonBlockingConnectionHandler(
             MessageEncoderDecoder<T> reader,
             BidiMessagingProtocol<T> protocol,
             SocketChannel chan,
-            Reactor reactor) {
+            Reactor reactor, ConnectionsImpl<T> connections1) {
         this.chan = chan;
         this.encdec = reader;
         this.protocol = protocol;
+        ((TFTPprotocol<T>)this.protocol).connections=connections1;
         this.reactor = reactor;
+        this.cons=connections1;
         //reactor.
     }
 

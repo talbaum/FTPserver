@@ -27,7 +27,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     public boolean send(int connectionId, Object msg) {
         if (MyConnections.containsKey(connectionId)) {
             ConnectionHandler<T> tmp= MyConnections.get(connectionId);
-            MyConnections.get(connectionId).send((T) msg);
+            tmp.send((T) msg);
             return true;
         }
         return false;
