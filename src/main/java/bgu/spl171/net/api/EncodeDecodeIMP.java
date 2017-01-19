@@ -66,6 +66,9 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
                     packet = new DISC(opcode);
                     break;
                 }
+                default:
+                    System.out.println("bad opcode.");
+                    break;
             }
         }
         else {
@@ -110,6 +113,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     {
         short result = (short)((byteArr[0] & 0xff) << 8);
         result += (short)(byteArr[1] & 0xff);
+        System.out.println("the result of bytes to short is " + result);
         return result;
     }
 }

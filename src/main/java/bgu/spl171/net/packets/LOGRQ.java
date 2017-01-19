@@ -12,6 +12,7 @@ public class LOGRQ extends Packet{
 
 	public LOGRQ(short opcode) {
 		super(opcode);
+		encode();
 	}
 
     public LOGRQ(short opcode, String username) {

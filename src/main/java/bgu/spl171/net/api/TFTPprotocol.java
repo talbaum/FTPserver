@@ -21,7 +21,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     int ID;
-    ConnectionsImpl connections;
+    ConnectionsImpl connections=new ConnectionsImpl();
     ConcurrentHashMap<String, LinkedList<Byte>> files = new ConcurrentHashMap<>();
     LinkedList<Byte> singleFileData = new LinkedList<>();
     boolean isBcast = false;
@@ -284,7 +284,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 }
 
 private byte[] LogrqHandle(Packet tmp) {
-    String username = ((LOGRQ) tmp).username;
+    System.out.println(((LOGRQ) tmp).username + " is the username");
+        String username = ((LOGRQ) tmp).username;
     if (!connections.MyConnections.contains(username)) {
         connections.MyConnections.put(ID, username);
         isLogged = true;
