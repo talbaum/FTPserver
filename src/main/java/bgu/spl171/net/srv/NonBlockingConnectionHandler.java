@@ -52,10 +52,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
             buf.flip();
             return () -> {
                 try {
-        int i=1;
                     while (buf.hasRemaining()) {
-                        System.out.println(i+ " times");
-                        i++;
                             T nextMessage = encdec.decodeNextByte(buf.get());
                             if (nextMessage != null && ((Packet)nextMessage).isFinished()) {
                                 protocol.process(nextMessage);
@@ -123,7 +120,9 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     @Override
     public void send(T msg) {
-        writeQueue.add(ByteBuffer.wrap(encdec.encode(msg)));
+        byte[] ans=encdec.encode(msg);
+        System.out.println(ans.length + " is the length of the ans (ACK 0 length is 5, without the slash 0)");
+        writeQueue.add(ByteBuffer.wrap(ans));
         reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     }
 }

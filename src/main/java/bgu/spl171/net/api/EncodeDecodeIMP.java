@@ -21,9 +21,12 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
             byteCount++;
             opcode = bytesToShort(opArr);
             Short s= new Short(opcode);
-            System.out.println(s.intValue());
+            System.out.println(s.intValue() + " is my opcode(byteCounter==1 at decode)");
 
             switch (opcode){
+                case((short)0):
+                    System.out.println("opcode 0? wtf?");
+                    break;
                 case((short)1):{
                     packet = new RRQandWRQ(opcode);
                     break;
@@ -49,7 +52,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
                     break;
                 }
                 case((short)7):{
-                    System.out.println("Login User");
+                    System.out.println("Login User Creation");
                     packet = new LOGRQ(opcode);
                     break;
                 }
@@ -82,7 +85,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
             byteCount = 0;
             return ans;
         }
-
         return packet;
     }
 
@@ -90,7 +92,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     @Override
     public byte[] encode(Packet message) {
         short myOp=message.getOpcode();
-        System.out.println(myOp);
+        System.out.println(myOp+ " is the encoded opcode (4 is ACK!)");
         switch (myOp){
             case((short)1): return ((RRQandWRQ)message).encode();
             case((short)2): return ((RRQandWRQ)message).encode();
@@ -111,7 +113,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     {
         short result = (short)((byteArr[0] & 0xff) << 8);
         result += (short)(byteArr[1] & 0xff);
-        System.out.println("the result of bytes to short is " + result);
         return result;
     }
 }

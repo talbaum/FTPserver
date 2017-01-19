@@ -79,6 +79,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     break;
             }
         }
+        System.out.println("finished proccesing, sending messege to client...");
         if (!isBcast)
             connections.send(ID, ans);
         else
@@ -287,13 +288,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 }
 
 private Packet LogrqHandle(Packet tmp) {
-    System.out.println(((LOGRQ) tmp).username + " is the username");
     String username = ((LOGRQ) tmp).username;
     if (loggedUsers.contains(username)) {
         return getError(7, ""); //user already logged in
     } else {
        if (!connections.MyConnections.contains(ID)) {
-            System.out.println("HAKOL TOV");
+            System.out.println("entered loginHandle");
             isLogged = true;
             loggedUsers.add(username);
             return checkACK(0, false);
