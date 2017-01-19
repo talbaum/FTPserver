@@ -1,5 +1,6 @@
 package bgu.spl171.net.api;
 
+import bgu.spl171.net.packets.Packet;
 import bgu.spl171.net.srv.BlockingConnectionHandler;
 import bgu.spl171.net.srv.ConnectionHandler;
 import bgu.spl171.net.srv.NonBlockingConnectionHandler;
@@ -19,9 +20,10 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     TFTPprotocol<T> tp= new TFTPprotocol<T>();
 
     public void addConnection(ConnectionHandler<T> CH){
-        MyConnections.put(nextId++,CH);
+        MyConnections.put(nextId,CH);
         //CH.AddAllCon(MyConnections);
-      //  tp.start(nextId-1,this);
+        tp.start(nextId,this);
+        nextId++;
         myConHandler=CH;
     }
 
@@ -29,6 +31,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     public boolean send(int connectionId, Object msg) {
         if (MyConnections.containsKey(connectionId)) {
             ConnectionHandler<T> tmp= MyConnections.get(connectionId);
+            System.out.println(((Packet)msg).isFinished());
             tmp.send((T) msg);
             return true;
         }

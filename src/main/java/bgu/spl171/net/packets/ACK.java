@@ -32,7 +32,8 @@ public class ACK extends Packet {
 		for (int i=0;i<blockBytes.length;i++){
 			ans[i+blockBytes.length]=blockBytes[i];
 		}
-		ans[ans.length-1]='\0';
+
+		ans[ans.length-1]='0';
 		return ans;
 	}
 

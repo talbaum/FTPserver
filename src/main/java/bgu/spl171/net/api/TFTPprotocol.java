@@ -45,7 +45,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     @Override
-    public void process(T message) {
+    public  void process(T message) {
 
         Packet tmp = (Packet) message;
         short OP = tmp.getOpcode();
@@ -61,28 +61,38 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 case 2:
                     ans = WRQhandle(tmp);
                     break;
-                case 3: ans=DataHandle(tmp);
+                case 3:
+                    ans = DataHandle(tmp);
                     break;
-                case 4:ans=AckHandle(tmp);
+                case 4:
+                    ans = AckHandle(tmp);
                     break;
-                case 5:ans = ErrorHandle(tmp);
+                case 5:
+                    ans = ErrorHandle(tmp);
                     break;
-                case 6:ans=DirqHandle(tmp);
+                case 6:
+                    ans = DirqHandle(tmp);
                     break;
-                case 7:ans=LogrqHandle(tmp);
+                case 7:
+                    ans = LogrqHandle(tmp);
                     break;
-                case 8:ans=DelrqHandle(tmp);
+                case 8:
+                    ans = DelrqHandle(tmp);
                     break;
-                case 9:ans=BcastHandle(tmp);
+                case 9:
+                    ans = BcastHandle(tmp);
                     break;
-                case 10:ans=DiscHandle(tmp);
+                case 10:
+                    ans = DiscHandle(tmp);
                     break;
             }
         }
         System.out.println("finished proccesing, sending messege to client...");
         if (!isBcast)
-            connections.send(ID, ans);
-        else
+            if (ans instanceof ACK)
+            {           System.out.println(ans.getOpcode() + " is the opcode");
+        connections.send(ID, ans);
+    }else
             isBcast = false;
     }
 

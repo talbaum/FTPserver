@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class LOGRQ extends Packet{
 	public String username;
-	private Vector<Byte> byteVec = new Vector<>();
+	public Vector<Byte> byteVec = new Vector<>();
 
 	public LOGRQ(short opcode) {
 		super(opcode);
@@ -29,7 +29,7 @@ public class LOGRQ extends Packet{
 		for (int i=0;i<usernameBytes.length;i++){
 			ans[i+opcodeBytes.length]=usernameBytes[i];
 		}
-		ans[ans.length-1]='\0';
+		ans[ans.length-1]='0';
 		return ans;
 	}
 
@@ -46,8 +46,10 @@ public class LOGRQ extends Packet{
 			}
 			try{
 				System.out.println("decoding username.....");
-				//this.username=new String(myStrbytes, "UTF-8");
-				this.username=new String(myStrbytes);
+				this.username=new String(myStrbytes, "UTF-8");
+				//this.username=new String(myStrbytes);
+
+
 			}
 			catch (Exception e){
 				System.out.println("username problem");
