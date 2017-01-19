@@ -40,6 +40,7 @@ public abstract class BaseServer<T> implements Server<T> {
                         clientSock,
                         encdecFactory.get(),
                         protocolFactory.get());
+
                 System.out.println("Before Execute");
                 execute(handler);
                 System.out.println("After Execute");

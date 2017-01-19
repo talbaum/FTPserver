@@ -23,6 +23,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     int ID;
     ConnectionsImpl connections=new ConnectionsImpl();
     ConcurrentHashMap<String, LinkedList<Byte>> files = new ConcurrentHashMap<>();
+    LinkedList<String> loggedUsers= new LinkedList<>();
     LinkedList<Byte> singleFileData = new LinkedList<>();
     boolean isBcast = false;
     boolean isLogged;
@@ -286,14 +287,18 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
 private byte[] LogrqHandle(Packet tmp) {
     System.out.println(((LOGRQ) tmp).username + " is the username");
-        String username = ((LOGRQ) tmp).username;
-    if (!connections.MyConnections.contains(username)) {
-        connections.MyConnections.put(ID, username);
-        isLogged = true;
-
-        return checkACK(0, false);
-    } else
+    String username = ((LOGRQ) tmp).username;
+    if (loggedUsers.contains(username)) {
         return getError(7, ""); //user already logged in
+    } else {
+        if (!connections.MyConnections.contains(ID)) {
+            connections.addConnection(ID, ); //connection handlr
+            isLogged = true;
+            loggedUsers.add(username);
+            return checkACK(0, false);
+        }
+        return getError(0, "");
+    }
 }
 
     private boolean removeFromFilesFolder(String deleteMe) {
