@@ -12,7 +12,6 @@ public class LOGRQ extends Packet{
 
 	public LOGRQ(short opcode) {
 		super(opcode);
-		encode();
 	}
 
     public LOGRQ(short opcode, String username) {
@@ -41,11 +40,17 @@ public class LOGRQ extends Packet{
 			return null;
 		}
 		else {
-			byte[] myStr=new byte[byteVec.size()];
-			for (int i=0;i<myStr.length;i++){
-				myStr[i]=byteVec.get(i);
+			byte[] myStrbytes=new byte[byteVec.size()];
+			for (int i=0;i<myStrbytes.length;i++){
+				myStrbytes[i]=byteVec.get(i);
 			}
-			this.username=new String(myStr, StandardCharsets.UTF_8);
+			try{
+				this.username=new String(myStrbytes, "UTF-8");
+			}
+			catch (Exception e){
+				System.out.println("username problem");
+			}
+
 			setFinished();
 			return this;
 		}

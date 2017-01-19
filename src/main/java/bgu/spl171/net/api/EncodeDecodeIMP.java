@@ -86,6 +86,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
             byteCount = 0;
             return ans;
         }
+
         return packet;
     }
 

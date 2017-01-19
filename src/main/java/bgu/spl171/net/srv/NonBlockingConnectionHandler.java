@@ -3,6 +3,8 @@ package bgu.spl171.net.srv;
 import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.MessageEncoderDecoder;
 import bgu.spl171.net.api.MessagingProtocol;
+import bgu.spl171.net.packets.Packet;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
@@ -48,12 +50,12 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
             buf.flip();
             return () -> {
                 try {
-
+        int i=1;
                     while (buf.hasRemaining()) {
-                        System.out.println("buff" + buf.toString());
+                        System.out.println(i+ " times");
+                        i++;
                             T nextMessage = encdec.decodeNextByte(buf.get());
-                            if (nextMessage != null) {
-                              //  System.out.println("GOOD TO BE HERE");
+                            if (nextMessage != null && ((Packet)nextMessage).isFinished()) {
                                 protocol.process(nextMessage);
                             }
                     }

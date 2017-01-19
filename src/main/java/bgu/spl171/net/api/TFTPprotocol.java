@@ -44,6 +44,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     @Override
     public void process(T message) {
+
         Packet tmp = (Packet) message;
         short OP = tmp.getOpcode();
         byte[] ans = null;
@@ -289,6 +290,7 @@ private byte[] LogrqHandle(Packet tmp) {
     if (!connections.MyConnections.contains(username)) {
         connections.MyConnections.put(ID, username);
         isLogged = true;
+
         return checkACK(0, false);
     } else
         return getError(7, ""); //user already logged in
