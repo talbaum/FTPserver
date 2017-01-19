@@ -49,7 +49,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
         Packet tmp = (Packet) message;
         short OP = tmp.getOpcode();
-        byte[] ans = null;
+        Packet ans = null;
 
         if (!isLogged && OP != 7) {
             ans = getError(6, ""); //user not logged in- cant make actions
@@ -91,18 +91,18 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return !isLogged;
     } //need to make sure
 
-    private byte[] checkACK(int blockNum, boolean isData) {
+    private ACK checkACK(int blockNum, boolean isData) {
         if (!isData){
-            ACK ans= new ACK(((short)05), (short) 0);
-            return ans.encode();
+            ACK ans= new ACK(((short)04), (short) 0);
+            return ans;
         }
         else {
-            ACK ans= new ACK(((short)05), (short) blockNum);
-            return ans.encode();
+            ACK ans= new ACK(((short)04), (short) blockNum);
+            return ans;
         }
     }
 
-    private byte[] getError(int errorCode, String errorMsg) {
+    private ERROR getError(int errorCode, String errorMsg) {
     short myOp= (short)errorCode;
     String errorMsg2="No error messege was acquired";
         switch (errorCode) {
@@ -124,7 +124,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 errorMsg2= ("User already logged in – Login username already connected.  " + errorMsg);break;
         }
         ERROR er=new ERROR(myOp,(short)errorCode,errorMsg2);
-        return er.encode();
+        return er;
     }
 
     private boolean byteToFile(byte[] tmp, String name) {
@@ -150,7 +150,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return arr;
     }
 
-    private byte[] readHelper(String fileToRead){
+    private DATA readHelper(String fileToRead){
         if (files.get(fileToRead).isEmpty()) {
             String letAllKnowRead = fileToRead + " has completed uploading to the server.";
             connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
@@ -165,12 +165,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             DATA ans = new DATA((short) 03, sizeOfData, (short) readBlockingCount, curData);
             readBlockingCount++;
             moreDataNeeded=true;
-            return ans.encode();
+            return ans;
         }
     }
 
-    private byte[] RRQhandle(Packet tmp) {
-      byte[]ans=null;
+    private Packet RRQhandle(Packet tmp) {
+      Packet ans=null;
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
         if (firstReadFlag) {
             if (files.containsKey(fileToRead))
@@ -189,12 +189,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             ans= readHelper(fileToRead);
             }
             else{
-                //didn't got more data. need to return error.
+                ans= getError(0, ""); //file not found for reading  //didn't got more data. need to return error.
             }
         }
         return ans;
     }
-    private byte[] WRQhandle(Packet tmp) {
+    private Packet WRQhandle(Packet tmp) {
         fileToWrite = ((RRQandWRQ) tmp).getFileName();
         if (!files.containsKey(fileToWrite)) {
 
@@ -206,12 +206,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                 byte[] myCurData = ((RRQandWRQ) tmp).data;
                 short myCurSize = (short) myCurData.length;
                 DATA fileData = new DATA((short) 03, myCurSize, (short) writeBlockingCount, myCurData);
-                byte[] ans = DataHandle(fileData);
+                Packet ans = DataHandle(fileData);
 
                 if (writeHasFinished) {
                     connections.send(ID, ans); //send the last ACK to the client
                     String letAllKnow = fileToWrite + " has completed uploading to the server.";
-                    connections.broadcast(letAllKnow.getBytes());// check if to my client or to everyone
+                    connections.broadcast(letAllKnow);// check if to my client or to everyone
                     isBcast = true; //cause of this it wont send it to the client again
                     writeHasFinished=false;
                     firstWriteFlag=true;
@@ -221,7 +221,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         } else
             return getError(5, ""); //file already exist
     }
-    private byte[] DataHandle(Packet tmp) {
+    private Packet DataHandle(Packet tmp) {
         byte[] byteArray = ((DATA) tmp).data;
 
         for (int i = 0; i < byteArray.length; i++)
@@ -257,7 +257,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             return checkACK(tmpCount, true);
     }
 
-    private byte[] AckHandle(Packet tmp) {
+    private ACK AckHandle(Packet tmp) {
         if (moreDataNeeded) {
            dataGotAck=true; //this is a data block, can send another block of data
             return checkACK(((DATA) tmp).blockNum, true);
@@ -265,11 +265,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             return checkACK(0, false);
         }
     }
-    private byte[] ErrorHandle(Packet tmp) {
+    private ERROR ErrorHandle(Packet tmp) {
         return getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
     }
 
-    private byte[] DirqHandle(Packet tmp) { //switch to good return
+    private Packet DirqHandle(Packet tmp) { //switch to good return
         String allFilesNames = "";
     for (String nameOfFile : files.keySet()) {
         allFilesNames += nameOfFile + " \0 ";
@@ -282,11 +282,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         short sizeOfByteArr=(short)fileNamesBytes.length;
 
         DATA ans= new DATA((short)03, sizeOfByteArr,(short)1,fileNamesBytes);
-            return ans.encode();
+            return ans;
     }
 }
 
-private byte[] LogrqHandle(Packet tmp) {
+private Packet LogrqHandle(Packet tmp) {
     System.out.println(((LOGRQ) tmp).username + " is the username");
     String username = ((LOGRQ) tmp).username;
     if (loggedUsers.contains(username)) {
@@ -321,7 +321,7 @@ private byte[] LogrqHandle(Packet tmp) {
             return false;
         }
     }
-    private byte[] DelrqHandle(Packet tmp){
+    private Packet DelrqHandle(Packet tmp){
         String filenameToDel = ((DELRQ) tmp).filename;
         if (files.containsKey(filenameToDel)) {
             files.remove(filenameToDel);
@@ -332,14 +332,14 @@ private byte[] LogrqHandle(Packet tmp) {
         } else
             return getError(1, ""); //file not found
     }
-    private byte[] BcastHandle(Packet tmp) {
+    private Packet BcastHandle(Packet tmp) {
 
         connections.broadcast(((BCAST) tmp).encode()); //make sure it's ok
         isBcast = true;
         return null;
     }
 
-    private byte[] DiscHandle(Packet tmp) {
+    private ACK DiscHandle(Packet tmp) {
         connections.disconnect(ID);
         isLogged = false;
         return checkACK(0, false);

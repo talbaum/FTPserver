@@ -6,7 +6,7 @@ abstract public class Packet{
 
 	public Packet(short opcode){
 		this.opcode=opcode;
-		isFinished=false;
+			isFinished=false;
 	}
 	public byte[] shortToBytes(short num)
 	{

@@ -90,6 +90,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     @Override
     public byte[] encode(Packet message) {
         short myOp=message.getOpcode();
+        System.out.println(myOp);
         switch (myOp){
             case((short)1): return ((RRQandWRQ)message).encode();
             case((short)2): return ((RRQandWRQ)message).encode();

@@ -16,10 +16,12 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     Integer nextId=0;
     ConcurrentHashMap<Integer ,ConnectionHandler<T>> MyConnections = new ConcurrentHashMap<Integer ,ConnectionHandler<T>>();
     ConnectionHandler<T> myConHandler;
+    TFTPprotocol<T> tp= new TFTPprotocol<T>();
 
     public void addConnection(ConnectionHandler<T> CH){
         MyConnections.put(nextId++,CH);
         //CH.AddAllCon(MyConnections);
+        tp.start(nextId-1,this);
         myConHandler=CH;
     }
 
