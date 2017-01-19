@@ -272,9 +272,10 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     private Packet DirqHandle(Packet tmp) { //switch to good return
         String allFilesNames = "";
-    for (String nameOfFile : files.keySet()) {
-        allFilesNames += nameOfFile + " \0 ";
-    }
+        if(files!=null)
+            for (String nameOfFile : files.keySet()) {
+            allFilesNames += nameOfFile + " \0 ";
+            }
 
     if (allFilesNames.equals(""))
         return getError(0, "No Files to show");
@@ -293,7 +294,7 @@ private Packet LogrqHandle(Packet tmp) {
         return getError(7, ""); //user already logged in
     } else {
        if (!connections.MyConnections.contains(ID)) {
-            System.out.println("entered loginHandle");
+            System.out.println(username+ "entered loginHandle");
             isLogged = true;
             loggedUsers.add(username);
             return checkACK(0, false);

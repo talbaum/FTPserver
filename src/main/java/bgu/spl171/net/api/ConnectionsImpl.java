@@ -21,7 +21,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     public void addConnection(ConnectionHandler<T> CH){
         MyConnections.put(nextId++,CH);
         //CH.AddAllCon(MyConnections);
-        tp.start(nextId-1,this);
+      //  tp.start(nextId-1,this);
         myConHandler=CH;
     }
 
