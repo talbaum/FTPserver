@@ -18,7 +18,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     Integer nextId=0;
     ConcurrentHashMap<Integer ,ConnectionHandler<T>> MyConnections = new ConcurrentHashMap<Integer ,ConnectionHandler<T>>();
 
-    public void addConnection(NonBlockingConnectionHandler<T> CH){
+    public void addConnection(ConnectionHandler<T> CH){
         MyConnections.put(nextId++,CH);
         //CH.AddAllCon(MyConnections);
     }

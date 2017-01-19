@@ -34,6 +34,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         this.encdec = reader;
         this.protocol = protocol;
         this.reactor = reactor;
+        //reactor.
     }
 
     public Runnable continueRead() {
