@@ -44,9 +44,7 @@ public abstract class BaseServer<T> implements Server<T> {
                         protocolFactory.get(),conImp);
 
                 conImp.addConnection(handler);
-                System.out.println("Before Execute");
                 execute(handler);
-                System.out.println("After Execute");
             }
         } catch (IOException ex) {
             System.out.println(ex.getMessage());

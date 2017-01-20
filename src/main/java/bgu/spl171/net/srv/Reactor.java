@@ -100,7 +100,6 @@ public class Reactor<T> implements Server<T> {
         SocketChannel clientChan = serverChan.accept();
         System.out.println("Operation Recivied!");
         clientChan.configureBlocking(false);
-        //class cast exception from EncoderDecoderImp to MessegeEncoderDecoder
         final NonBlockingConnectionHandler handler = new NonBlockingConnectionHandler(
                 readerFactory.get(),
                 protocolFactory.get(),

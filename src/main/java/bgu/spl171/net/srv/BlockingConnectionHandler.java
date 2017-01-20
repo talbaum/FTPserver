@@ -55,7 +55,10 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     @Override
     public void send(T msg) {
         try {
-            out.write(encdec.encode(msg));
+            byte[]tmp=encdec.encode(msg);
+            System.out.println(tmp.length + " is the number of bytes sent");
+            System.out.println("sending in blocking...");
+            out.write(tmp);
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
