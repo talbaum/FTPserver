@@ -88,11 +88,10 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             }
         }
         System.out.println("finished proccesing, sending messege to client...");
-        if (!isBcast)
-            if (ans instanceof ACK)
-            {           System.out.println(ans.getOpcode() + " is the opcode");
-        connections.send(ID, ans);
-    }else
+        if (!isBcast) {
+            System.out.println(ans.getOpcode() + " is the opcode");
+            connections.send(ID, ans);
+        }else
             isBcast = false;
     }
 
@@ -105,16 +104,17 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private ACK checkACK(int blockNum, boolean isData) {
         if (!isData){
             ACK ans= new ACK(((short)04), (short) 0);
+            ans.setFinished();
             return ans;
         }
         else {
             ACK ans= new ACK(((short)04), (short) blockNum);
+          ans.setFinished();
             return ans;
         }
     }
 
     private ERROR getError(int errorCode, String errorMsg) {
-    short myOp= (short)errorCode;
     String errorMsg2="No error messege was acquired";
         switch (errorCode) {
             case (short)0:
@@ -134,7 +134,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             case (short)7:
                 errorMsg2= ("User already logged in – Login username already connected.  " + errorMsg);break;
         }
-        ERROR er=new ERROR(myOp,(short)errorCode,errorMsg2);
+        ERROR er=new ERROR((short)5,(short)errorCode,errorMsg2);
+          er.setFinished();
         return er;
     }
 
