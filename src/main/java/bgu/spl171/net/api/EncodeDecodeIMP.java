@@ -28,26 +28,32 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
                     System.out.println("opcode 0? wtf?");
                     break;
                 case((short)1):{
+                    System.out.println("RRQ Creation");
                     packet = new RRQandWRQ(opcode);
                     break;
                 }
                 case((short)2):{
+                    System.out.println("WRQ Creation");
                     packet = new RRQandWRQ(opcode);
                     break;
                 }
                 case((short)3):{
+                    System.out.println("Data Creation");
                     packet = new DATA(opcode);
                     break;
                 }
                 case((short)4):{
+                    System.out.println("ACK Creation");
                     packet = new ACK(opcode);
                     break;
                 }
                 case((short)5):{
+                    System.out.println("Error Creation");
                     packet = new ERROR(opcode);
                     break;
                 }
                 case((short)6): {
+                    System.out.println("Dirq Creation");
                     packet = new DIRQ(opcode);
                     break;
                 }
@@ -57,14 +63,17 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
                     break;
                 }
                 case((short)8):{
+                    System.out.println("Delrq Creation");
                     packet = new DELRQ(opcode);
                     break;
                 }
                 case((short)9):{
+                    System.out.println("BCAST Creation");
                     packet = new BCAST(opcode);
                     break;
                 }
                 case((short)10): {
+                    System.out.println("Discconcet User Creation");
                     packet = new DISC(opcode);
                     break;
                 }
