@@ -7,6 +7,7 @@ import sun.awt.image.ImageWatched;
 
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.*;
@@ -100,7 +101,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     @Override
     public boolean shouldTerminate() {
-        return !isLogged;
+        //return !isLogged;
+        return false;
     } //need to make sure
 
     private ACK checkACK(int blockNum, boolean isData) {
@@ -192,7 +194,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
       Packet ans=null;
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
         if (firstReadFlag) {
-            if (files.containsKey(fileToRead))
+            if (files.containsKey(fileToRead) || searchTheFileInFolder(fileToRead))
                 ans= readHelper(fileToRead);
             else
                 ans= getError(1, ""); //file not found for reading
@@ -216,8 +218,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private Packet WRQhandle(Packet tmp) {
         System.out.println("Handling WRQ");
         fileToWrite = ((RRQandWRQ) tmp).getFileName();
-        if (!files.containsKey(fileToWrite)) {
-
+        if (!searchTheFileInFolder(fileToWrite)) {
+        // was if(!files.containsKey(fileToWrite))
             if (firstWriteFlag) {
                 firstWriteFlag = false;
                 return checkACK(0, false);
@@ -290,34 +292,33 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
     }
 
-    private Packet DirqHandle(Packet tmp) { //switch to good return
-       //need to check if already exits files
+    private Packet DirqHandle(Packet tmp) {
         System.out.println("Handling DIRQ");
-        String answer=null;
+        String allFilesNames = "";
         String textPath= "C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files";
         Path path = Paths.get(textPath);
         try {
-           Stream<Path> filesAtServer= Files.list(path);
-             answer= filesAtServer.toString();
-            System.out.println(answer + "  are all the names");
+            Stream<Path> allFiles= Files.list(path);
+            Object[] allFilesArr=allFiles.toArray();
+            for(Object file:allFilesArr ){
+                allFilesNames+= ((File)file).getName() + '\0' + "";
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println(allFilesNames + "  are all the names");
 
-        String allFilesNames = "";
+        /*
         if(files!=null)
             for (String nameOfFile : files.keySet()) {
             allFilesNames += nameOfFile + " \0 ";
-            }
+            }*/
 
-    if (allFilesNames.equals("") && answer!=null)
+    if (allFilesNames.equals(""))
         return getError(0, "No Files to show");
     else{
-    /*    byte[]fileNamesBytes= allFilesNames.getBytes();
-        short sizeOfByteArr=(short)fileNamesBytes.length;*/
-        byte[]fileNamesBytes= answer.getBytes();
+        byte[]fileNamesBytes= allFilesNames.getBytes();
         short sizeOfByteArr=(short)fileNamesBytes.length;
-
         DATA ans= new DATA((short)03, sizeOfByteArr,(short)1,fileNamesBytes);
             return ans;
     }
@@ -358,10 +359,33 @@ private Packet LogrqHandle(Packet tmp) {
             return false;
         }
     }
-    private Packet DelrqHandle(Packet tmp){
+    private boolean searchTheFileInFolder(String findMe){
+        String textPath= "C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files";
+        Path path = Paths.get(textPath);
+        try {
+            Stream<Path> allFiles= Files.list(path);
+            Object[] allFilesArr=allFiles.toArray();
+            for(Object file:allFilesArr ){
+               if(((File)file).getName().equals(findMe))
+                   return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    return false;
+    }
+
+    private Packet DelrqHandle(Packet tmp) {
         System.out.println("Handling DELRQ");
         String filenameToDel = ((DELRQ) tmp).filename;
-        if (files.containsKey(filenameToDel)) {
+        if (searchTheFileInFolder(filenameToDel)) {
+            removeFromFilesFolder(filenameToDel);
+            return checkACK(0, false);
+        } else
+            return getError(1, ""); //cannot read violation
+    }
+
+  /*      if (files.containsKey(filenameToDel)) {
             files.remove(filenameToDel);
             if (removeFromFilesFolder(filenameToDel))
                 return checkACK(0, false);
@@ -369,7 +393,7 @@ private Packet LogrqHandle(Packet tmp) {
                 return getError(2, ""); //cannot read violation
         } else
             return getError(1, ""); //file not found
-    }
+    }*/
     private Packet BcastHandle(Packet tmp) {
         System.out.println("Handling BCAST");
         connections.broadcast(((BCAST) tmp).encode()); //make sure it's ok

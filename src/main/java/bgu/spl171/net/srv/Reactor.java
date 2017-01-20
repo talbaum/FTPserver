@@ -55,7 +55,7 @@ public class Reactor<T> implements Server<T> {
             System.out.println("Trying to connect Man...");
             while (!Thread.currentThread().isInterrupted()) {
                 selector.select();
-                System.out.println("Operation Recivied!");
+          //      System.out.println("Operation Recivied!");
                 runSelectionThreadTasks();
 
                 for (SelectionKey key : selector.selectedKeys()) {
@@ -98,6 +98,7 @@ public class Reactor<T> implements Server<T> {
 
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
         SocketChannel clientChan = serverChan.accept();
+        System.out.println("Operation Recivied!");
         clientChan.configureBlocking(false);
         //class cast exception from EncoderDecoderImp to MessegeEncoderDecoder
         final NonBlockingConnectionHandler handler = new NonBlockingConnectionHandler(
