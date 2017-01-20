@@ -6,10 +6,8 @@ import bgu.spl171.net.packets.*;
 import sun.awt.image.ImageWatched;
 
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.xml.bind.SchemaOutputResolver;
+import java.io.*;
 import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,7 +85,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     break;
                 case 10:
                     ans = DiscHandle(tmp);
-                    connections.disconnect(ID);
                     break;
             }
         }
@@ -95,6 +92,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         if (!isBcast) {
             System.out.println(ans.getOpcode() + " is the opcode");
             connections.send(ID, ans);
+            if(shouldTerminate())
+                connections.disconnect(ID);
         }else
             isBcast = false;
     }
@@ -149,7 +148,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private boolean byteToFile(byte[] tmp, String name) {
-        Path p = Paths.get("./Files"+name);
+        /*Path p = Paths.get("Files"+name);
         try (OutputStream out = new BufferedOutputStream(
                 Files.newOutputStream(p, CREATE, APPEND))) {
             out.write(tmp, 0, tmp.length);
@@ -157,8 +156,39 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         } catch (IOException x) {
             System.err.println(x);
             return false;
+        }*/
+        FileOutputStream fos = null;
+        File file;
+        try {
+            //Specify the file path here
+            file = new File("Files" + File.separator + "name");
+            fos = new FileOutputStream(file);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            fos.write(tmp);
+            fos.flush();
+            System.out.println("File Written Successfully");
+            return true;
         }
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        finally {
+            try {
+                if (fos != null)
+                {
+                    fos.close();
+                }
+            }
+            catch (IOException ioe) {
+                System.out.println("Error in closing the Stream");
+                return false;
+            }
+        }
+return false;
     }
+
 
     private byte[] readMaximum512Bytes(String readMe) {
         byte[] arr = new byte[512];
@@ -172,7 +202,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private DATA readHelper(String fileToRead){
+        System.out.println("entered read helper");
         if (files.get(fileToRead).isEmpty()) {
+            System.out.println("is empty ");
             String letAllKnowRead = fileToRead + " has completed uploading to the server.";
             connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
             isBcast = true;
@@ -181,6 +213,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             return null;
         }
         else {
+            System.out.println("not is empty");
             byte[] curData = readMaximum512Bytes(fileToRead); //change to good return op code bock
             short sizeOfData = (short) curData.length;
             DATA ans = new DATA((short) 03, sizeOfData, (short) readBlockingCount, curData);
@@ -194,6 +227,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         System.out.println("Handling RRQ");
       Packet ans=null;
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
+        System.out.println("the requetsed filename is: "+ fileToRead);
         if (firstReadFlag) {
             if (files.containsKey(fileToRead) || searchTheFileInFolder(fileToRead))
                 ans= readHelper(fileToRead);
@@ -296,18 +330,18 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private Packet DirqHandle(Packet tmp) {
         System.out.println("Handling DIRQ");
         String allFilesNames = "";
-    /*   // String textPath= "C:\\Users\\amitu\\Desktop\\spl-net\\Files";
         String textPath="Files" + File.separator;
         Path path = Paths.get(textPath);
         try {
+
+           File[]allFilesArr= File.listRoots();
             Stream<Path> allFiles= Files.list(path);
-            Object[] allFilesArr=allFiles.
-            for(Object file:allFilesArr ){
-                allFilesNames+= ((File)file).getName() + '\0' + "";
+            for(File file:allFilesArr ){
+                allFilesNames+= (file.getName() + '\0' + "");
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
         System.out.println(allFilesNames + "  are all the names");
 
             if(files!=null)
@@ -361,7 +395,7 @@ private Packet LogrqHandle(Packet tmp) {
         }
     }
     private boolean searchTheFileInFolder(String findMe){
-        String textPath= "C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files";
+     /*   String textPath= "Files";
         Path path = Paths.get(textPath);
         try {
             Stream<Path> allFiles= Files.list(path);
@@ -373,7 +407,20 @@ private Packet LogrqHandle(Packet tmp) {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    return false;
+    return false;*/
+        System.out.println("SEARCH THE FILE!!");
+        File curDir = new File("Files");
+        File[] filesList = curDir.listFiles();
+        for(File f : filesList){
+            System.out.println(f.getName());
+            System.out.println(findMe);
+               if(f.getName().equals(findMe)) {
+                   System.out.println(f.getName().equals(findMe));
+                   return true;
+               }
+
+        }
+return false;
     }
 
     private Packet DelrqHandle(Packet tmp) {

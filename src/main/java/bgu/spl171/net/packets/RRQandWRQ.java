@@ -56,7 +56,12 @@ public class RRQandWRQ extends Packet {
 			for (int i = 0;i<myStr.length;i++) {
 				myStr[i]=byteVec.get(i);
 			}
-			this.filename=new String(myStr, StandardCharsets.UTF_8);
+			/*System.out.println(new String(myStr));
+			System.out.println(new String(myStr,StandardCharsets.UTF_8));
+			System.out.println(new String(myStr,0,myStr.length));*/
+			//System.out.println(new String(myStr,0,myStr.length,StandardCharsets.UTF_8));
+			this.filename=new String(myStr,0,myStr.length, StandardCharsets.UTF_8);
+			System.out.println(this.filename);
 			setFinished();
 			return this;
 		}
