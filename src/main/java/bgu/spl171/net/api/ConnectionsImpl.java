@@ -31,7 +31,7 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
     public boolean send(int connectionId, Object msg) {
         if (MyConnections.containsKey(connectionId)) {
             ConnectionHandler<T> tmp= MyConnections.get(connectionId);
-            System.out.println(((Packet)msg).isFinished());
+            System.out.println(((Packet)msg).isFinished() + " is finished");
             tmp.send((T) msg);
             return true;
         }
