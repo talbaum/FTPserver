@@ -101,8 +101,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 
     @Override
     public boolean shouldTerminate() {
-        //return !isLogged;
-        return false;
+        return !isLogged;
+       // return false;
     } //need to make sure
 
     private ACK checkACK(int blockNum, boolean isData) {

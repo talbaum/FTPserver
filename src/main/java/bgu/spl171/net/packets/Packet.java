@@ -33,5 +33,7 @@ abstract public class Packet{
 	}
 	public void setFinished(){
 		isFinished=true;
+
+
 	}
 }

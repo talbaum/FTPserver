@@ -25,7 +25,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
 
             switch (opcode){
                 case((short)0):
-                    System.out.println("opcode 0? wtf?");
+                    System.out.println("opcode 0?");
                     break;
                 case((short)1):{
                     System.out.println("RRQ Creation");
@@ -86,11 +86,15 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
         }
 
         if(byteCount==2 && ((opcode==(short)6) || opcode==((short)10)))
+        {
+            packet.decode(nextByte);
             packet.setFinished();
+        }
 
         if(packet!=null&&packet.isFinished()) {
             Packet ans=packet;
             packet=null;
+            System.out.println(byteCount + " is all the bytes i have in this package");
             byteCount = 0;
             return ans;
         }
