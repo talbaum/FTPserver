@@ -38,7 +38,7 @@ public class ERROR extends Packet{
 		for (int i=0;i<errMsgBytes.length;i++){
 			ans[opcodeBytes.length+errCodeBytes.length+i]=errMsgBytes[i];
 		}
-		ans[ans.length-1]='\0';
+		ans[ans.length-1]='0';
 		return ans;
 	}
 

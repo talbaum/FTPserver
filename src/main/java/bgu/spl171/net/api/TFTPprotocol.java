@@ -87,6 +87,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     break;
                 case 10:
                     ans = DiscHandle(tmp);
+                    connections.disconnect(ID);
                     break;
             }
         }
@@ -295,7 +296,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private Packet DirqHandle(Packet tmp) {
         System.out.println("Handling DIRQ");
         String allFilesNames = "";
-        String textPath= "C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files";
+        String textPath= "C:\\Users\\amitu\\Desktop\\spl-net\\Files";
         Path path = Paths.get(textPath);
         try {
             Stream<Path> allFiles= Files.list(path);
@@ -403,7 +404,7 @@ private Packet LogrqHandle(Packet tmp) {
 
     private ACK DiscHandle(Packet tmp) {
         System.out.println("Handling DISC");
-        connections.disconnect(ID);
+
         isLogged = false;
         return checkACK(0, false);
     }

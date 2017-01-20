@@ -29,13 +29,13 @@ public class LOGRQ extends Packet{
 		for (int i=0;i<usernameBytes.length;i++){
 			ans[i+opcodeBytes.length]=usernameBytes[i];
 		}
-		ans[ans.length-1]='0';
+		ans[ans.length-1]=0;
 		return ans;
 	}
 
 	@Override
 	public Packet decode(byte nextByte) {
-		if (nextByte!='\0'){
+		if (nextByte!='0'){
 			byteVec.add(nextByte);
 			return null;
 		}

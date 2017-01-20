@@ -47,7 +47,7 @@ public class BCAST extends Packet{
 			return null;
 		}
 		else{			
-			if (nextByte!='\0'){
+			if (nextByte!='0'){
 				byteVec.add(nextByte);
 				return null;
 			}

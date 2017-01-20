@@ -48,7 +48,7 @@ public class RRQandWRQ extends Packet {
 
 	@Override
 	public Packet decode(byte nextByte) {
-		if (nextByte!='\0') {
+		if (nextByte!='0') {
 			byteVec.add(nextByte);
 			return null;
 		} else {
