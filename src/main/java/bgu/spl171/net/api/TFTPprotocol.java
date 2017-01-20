@@ -3,6 +3,7 @@ import bgu.spl171.net.api.BidiMessagingProtocol;
 import bgu.spl171.net.api.Connections;
 import bgu.spl171.net.api.ConnectionsImpl;
 import bgu.spl171.net.packets.*;
+import sun.awt.image.ImageWatched;
 
 
 import java.io.BufferedOutputStream;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -102,6 +104,9 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     } //need to make sure
 
     private ACK checkACK(int blockNum, boolean isData) {
+
+        System.out.println("Entered Check ACK");
+
         if (!isData){
             ACK ans= new ACK(((short)04), (short) 0);
             ans.setFinished();
@@ -115,6 +120,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private ERROR getError(int errorCode, String errorMsg) {
+        System.out.println("Entered Get Error");
     String errorMsg2="No error messege was acquired";
         switch (errorCode) {
             case (short)0:
@@ -182,6 +188,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private Packet RRQhandle(Packet tmp) {
+        System.out.println("Handling RRQ");
       Packet ans=null;
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
         if (firstReadFlag) {
@@ -207,6 +214,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         return ans;
     }
     private Packet WRQhandle(Packet tmp) {
+        System.out.println("Handling WRQ");
         fileToWrite = ((RRQandWRQ) tmp).getFileName();
         if (!files.containsKey(fileToWrite)) {
 
@@ -234,6 +242,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             return getError(5, ""); //file already exist
     }
     private Packet DataHandle(Packet tmp) {
+        System.out.println("Handling data");
         byte[] byteArray = ((DATA) tmp).data;
 
         for (int i = 0; i < byteArray.length; i++)
@@ -282,16 +291,31 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private Packet DirqHandle(Packet tmp) { //switch to good return
+       //need to check if already exits files
+        System.out.println("Handling DIRQ");
+        String answer=null;
+        String textPath= "C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files";
+        Path path = Paths.get(textPath);
+        try {
+           Stream<Path> filesAtServer= Files.list(path);
+             answer= filesAtServer.toString();
+            System.out.println(answer + "  are all the names");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         String allFilesNames = "";
         if(files!=null)
             for (String nameOfFile : files.keySet()) {
             allFilesNames += nameOfFile + " \0 ";
             }
 
-    if (allFilesNames.equals(""))
+    if (allFilesNames.equals("") && answer!=null)
         return getError(0, "No Files to show");
     else{
-        byte[]fileNamesBytes= allFilesNames.getBytes();
+    /*    byte[]fileNamesBytes= allFilesNames.getBytes();
+        short sizeOfByteArr=(short)fileNamesBytes.length;*/
+        byte[]fileNamesBytes= answer.getBytes();
         short sizeOfByteArr=(short)fileNamesBytes.length;
 
         DATA ans= new DATA((short)03, sizeOfByteArr,(short)1,fileNamesBytes);
@@ -300,6 +324,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
 }
 
 private Packet LogrqHandle(Packet tmp) {
+    System.out.println("Handling LOGRQ");
     String username = ((LOGRQ) tmp).username;
     if (loggedUsers.contains(username)) {
         return getError(7, ""); //user already logged in
@@ -334,6 +359,7 @@ private Packet LogrqHandle(Packet tmp) {
         }
     }
     private Packet DelrqHandle(Packet tmp){
+        System.out.println("Handling DELRQ");
         String filenameToDel = ((DELRQ) tmp).filename;
         if (files.containsKey(filenameToDel)) {
             files.remove(filenameToDel);
@@ -345,13 +371,14 @@ private Packet LogrqHandle(Packet tmp) {
             return getError(1, ""); //file not found
     }
     private Packet BcastHandle(Packet tmp) {
-
+        System.out.println("Handling BCAST");
         connections.broadcast(((BCAST) tmp).encode()); //make sure it's ok
         isBcast = true;
         return null;
     }
 
     private ACK DiscHandle(Packet tmp) {
+        System.out.println("Handling DISC");
         connections.disconnect(ID);
         isLogged = false;
         return checkACK(0, false);

@@ -92,7 +92,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     @Override
     public  byte[] encode(Packet message) {
         short myOp=message.getOpcode();
-        System.out.println(myOp+ " is the encoded opcode (4 is ACK!)");
+        System.out.println(myOp+ " is the encoded opcode (4 is ACK! 7 is LOGRQ!d)");
         switch (myOp){
             case((short)1): return ((RRQandWRQ)message).encode();
             case((short)2): return ((RRQandWRQ)message).encode();
