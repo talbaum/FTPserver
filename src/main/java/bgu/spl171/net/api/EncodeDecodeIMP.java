@@ -21,7 +21,7 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
             byteCount++;
             opcode = bytesToShort(opArr);
             Short s= new Short(opcode);
-            System.out.println(s.intValue() + " is my opcode(byteCounter==1 at decode)");
+           // System.out.println(s.intValue() + " is my opcode(byteCounter==1 at decode)");
 
             switch (opcode){
                 case((short)0):

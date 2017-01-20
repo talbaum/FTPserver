@@ -296,24 +296,24 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private Packet DirqHandle(Packet tmp) {
         System.out.println("Handling DIRQ");
         String allFilesNames = "";
-        String textPath= "C:\\Users\\amitu\\Desktop\\spl-net\\Files";
+    /*   // String textPath= "C:\\Users\\amitu\\Desktop\\spl-net\\Files";
+        String textPath="Files" + File.separator;
         Path path = Paths.get(textPath);
         try {
             Stream<Path> allFiles= Files.list(path);
-            Object[] allFilesArr=allFiles.toArray();
+            Object[] allFilesArr=allFiles.
             for(Object file:allFilesArr ){
                 allFilesNames+= ((File)file).getName() + '\0' + "";
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         System.out.println(allFilesNames + "  are all the names");
 
-        /*
-        if(files!=null)
+            if(files!=null)
             for (String nameOfFile : files.keySet()) {
             allFilesNames += nameOfFile + " \0 ";
-            }*/
+            }
 
     if (allFilesNames.equals(""))
         return getError(0, "No Files to show");
