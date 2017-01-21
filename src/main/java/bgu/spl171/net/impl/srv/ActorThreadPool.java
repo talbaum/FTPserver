@@ -1,4 +1,4 @@
-package bgu.spl171.net.impl.TFTPtpc.srv;
+package bgu.spl171.net.impl.srv;
 
 import java.util.LinkedList;
 import java.util.Map;

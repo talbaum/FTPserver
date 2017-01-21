@@ -1,4 +1,4 @@
-package bgu.spl171.net.impl.TFTPtpc.packets;
+package bgu.spl171.net.impl.packets;
 import java.nio.ByteBuffer;
 /**
  * Created by baum on 10/01/2017.

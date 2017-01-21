@@ -1,12 +1,11 @@
-package bgu.spl171.net.impl.TFTPtpc.packets;
+package bgu.spl171.net.impl.packets;
 /**
  * Created by baum on 10/01/2017.
  */
-public class DIRQ extends Packet{
-	public DIRQ(short opcode){
+public class DISC extends Packet{
+	public DISC(short opcode) {
 		super(opcode);
 	}
-
 	public byte[] encode(){
 		byte[] ans=shortToBytes(opcode);
 		return ans;
@@ -17,5 +16,5 @@ public class DIRQ extends Packet{
 		setFinished();
 		return null;
 	}
-
+	
 }

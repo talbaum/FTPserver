@@ -1,7 +1,7 @@
-package bgu.spl171.net.impl.TFTPtpc;
+package bgu.spl171.net.impl;
 
-import bgu.spl171.net.impl.TFTPtpc.api.MessageEncoderDecoder;
-import bgu.spl171.net.impl.TFTPtpc.packets.*;
+import bgu.spl171.net.impl.api.MessageEncoderDecoder;
+import bgu.spl171.net.impl.packets.*;
 
 public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     private Packet packet;

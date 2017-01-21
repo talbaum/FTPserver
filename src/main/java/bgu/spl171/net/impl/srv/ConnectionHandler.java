@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bgu.spl171.net.impl.TFTPtpc.srv;
+package bgu.spl171.net.impl.srv;
 
 import java.io.Closeable;
 

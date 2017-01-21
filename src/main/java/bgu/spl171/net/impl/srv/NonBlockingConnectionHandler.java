@@ -1,9 +1,10 @@
-package bgu.spl171.net.impl.TFTPtpc.srv;
+package bgu.spl171.net.impl.srv;
 
-import bgu.spl171.net.impl.TFTPtpc.api.*;
-import bgu.spl171.net.impl.TFTPtpc.ConnectionsImpl;
-import bgu.spl171.net.impl.TFTPtpc.TFTPprotocol;
-import bgu.spl171.net.impl.TFTPtpc.packets.Packet;
+import bgu.spl171.net.impl.ConnectionsImpl;
+import bgu.spl171.net.impl.TFTPprotocol;
+import bgu.spl171.net.impl.api.BidiMessagingProtocol;
+import bgu.spl171.net.impl.packets.Packet;
+import bgu.spl171.net.impl.api.MessageEncoderDecoder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

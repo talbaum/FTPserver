@@ -1,7 +1,7 @@
-package bgu.spl171.net.impl.TFTPtpc;
-import bgu.spl171.net.impl.TFTPtpc.api.BidiMessagingProtocol;
-import bgu.spl171.net.impl.TFTPtpc.api.Connections;
-import bgu.spl171.net.impl.TFTPtpc.packets.*;
+package bgu.spl171.net.impl;
+import bgu.spl171.net.impl.api.BidiMessagingProtocol;
+import bgu.spl171.net.impl.api.Connections;
+import bgu.spl171.net.impl.packets.*;
 
 
 import java.io.*;
@@ -286,7 +286,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     private Packet DirqHandle(Packet tmp) {
         String allFilesNames = "";
         String textPath="Files" + File.separator;
-        File folder = new File("files");
+        File folder = new File("Files");
 
         File[]allFilesArr= folder.listFiles();
         for(File file:allFilesArr ){

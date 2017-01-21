@@ -1,7 +1,8 @@
-package bgu.spl171.net.impl.TFTPtpc.srv;
+package bgu.spl171.net.impl.srv;
 
-import bgu.spl171.net.impl.TFTPtpc.EncodeDecodeIMP;
-import bgu.spl171.net.impl.TFTPtpc.packets.*;
+import bgu.spl171.net.impl.EncodeDecodeIMP;
+import bgu.spl171.net.impl.packets.*;
+
 import java.nio.charset.StandardCharsets;
 
 public class EncdecTest {
