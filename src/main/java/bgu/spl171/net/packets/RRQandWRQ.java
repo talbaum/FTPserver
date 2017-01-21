@@ -8,8 +8,8 @@ import java.util.Vector;
 public class RRQandWRQ extends Packet {
 	public String filename;
 	public byte[] data;
-	private Vector<Byte> byteVec;
-
+	public Vector<Byte> byteVec;
+	public int size=0;
 
 	public RRQandWRQ(short opcode) {
 		super(opcode);
@@ -49,19 +49,18 @@ public class RRQandWRQ extends Packet {
 	@Override
 	public Packet decode(byte nextByte) {
 		if (nextByte!='0') {
+			size++;
 			byteVec.add(nextByte);
 			return null;
 		} else {
 			byte[] myStr=new byte[byteVec.size()];
 			for (int i = 0;i<myStr.length;i++) {
-				myStr[i]=byteVec.get(i);
+				myStr[i]=byteVec.remove(0);
 			}
-			/*System.out.println(new String(myStr));
-			System.out.println(new String(myStr,StandardCharsets.UTF_8));
-			System.out.println(new String(myStr,0,myStr.length));*/
-			//System.out.println(new String(myStr,0,myStr.length,StandardCharsets.UTF_8));
+
 			this.filename=new String(myStr,0,myStr.length, StandardCharsets.UTF_8);
 			System.out.println(this.filename);
+
 			setFinished();
 			return this;
 		}

@@ -10,6 +10,7 @@ import javax.xml.bind.SchemaOutputResolver;
 import java.io.*;
 import java.nio.file.*;
 import java.util.LinkedList;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -30,6 +31,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     boolean isBcast = false;
     boolean isLogged;
     boolean firstWriteFlag=true;
+    boolean isACKfirst;
     boolean firstReadFlag=true;
     boolean moreDataNeeded;
     boolean dataGotAck;
@@ -60,8 +62,11 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     ans = RRQhandle(tmp);
                     break;
                 case 2:
-                    ans = WRQhandle(tmp);
-                    break;
+                    ans=WRQhandle(tmp);
+                    // DATA dataPack = new DATA((short)3,)
+                      //  ans = DataHandle(tmp);
+
+                        break;
                 case 3:
                     ans = DataHandle(tmp);
                     break;
@@ -258,6 +263,9 @@ return false;
         // was if(!files.containsKey(fileToWrite))
             if (firstWriteFlag) {
                 firstWriteFlag = false;
+             //   connections.send(ID,checkACK(0, false));
+                isACKfirst= true;
+                tmp.setFinished();
                 return checkACK(0, false);
             }
             else {
@@ -274,14 +282,19 @@ return false;
                     writeHasFinished=false;
                     firstWriteFlag=true;
                 }
-                return ans;
+                isACKfirst= true;
             }
         } else
-            return getError(5, ""); //file already exist
+           // connections.send(ID,getError(5, "")); //file already exist
+           // connections.send(ID,getError(5, "")); //file already exist
+        isACKfirst= false;
+        tmp.setFinished();
+        return getError(5, ""); //file already exist
     }
     private Packet DataHandle(Packet tmp) {
         System.out.println("Handling data");
-        byte[] byteArray = ((DATA) tmp).data;
+        byte[] byteArray= ((RRQandWRQ) tmp).data;
+
 
         for (int i = 0; i < byteArray.length; i++)
             singleFileData.add(byteArray[i]);
@@ -289,7 +302,7 @@ return false;
         int tmpCount=writeBlockingCount;
         writeBlockingCount++;
 
-        if (((DATA) tmp).packetSize < 512) {
+        if (((RRQandWRQ) tmp).size < 512) {
             files.put(fileToWrite, singleFileData);
             byteArray = new byte[singleFileData.size()];
 
@@ -327,39 +340,38 @@ return false;
     private ERROR ErrorHandle(Packet tmp) {
         return getError(((ERROR) tmp).errorCode, ((ERROR) tmp).errMsg);
     }
-
     private Packet DirqHandle(Packet tmp) {
         System.out.println("Handling DIRQ");
         String allFilesNames = "";
         String textPath="Files" + File.separator;
-        Path path = Paths.get(textPath);
-        try {
+        File folder = new File("files");
+        //Path path = Paths.get(textPath);
 
-           File[]allFilesArr= File.listRoots();
-            Stream<Path> allFiles= Files.list(path);
-            for(File file:allFilesArr ){
-                allFilesNames+= (file.getName() + '\0' + "");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        File[]allFilesArr= folder.listFiles();
+        //Stream<Path> allFiles= folder.list(path);
+        for(File file:allFilesArr ){
+            System.out.println("name: " +file.getName());
+            allFilesNames+= (file.getName() + '\0');
         }
+
+        //allFilesNames=allFilesNames.substring(0,allFilesNames.length());
+
         System.out.println(allFilesNames + "  are all the names");
 
-            if(files!=null)
+        if(files!=null)
             for (String nameOfFile : files.keySet()) {
-            allFilesNames += nameOfFile + " \0 ";
+                allFilesNames += nameOfFile + " \0 ";
             }
-allFilesNames+='0';
-    if (allFilesNames.equals('0'))
-        return getError(0, "No Files to show");
-    else{
-        byte[]fileNamesBytes= allFilesNames.getBytes();
-        short sizeOfByteArr=(short)fileNamesBytes.length;
-        DATA ans= new DATA((short)03, sizeOfByteArr,(short)1,fileNamesBytes);
+        allFilesNames+='0';
+        if (allFilesNames.equals('0'))
+            return getError(0, "No Files to show");
+        else{
+            byte[]fileNamesBytes= allFilesNames.getBytes();
+            short sizeOfByteArr=(short)fileNamesBytes.length;
+            DATA ans= new DATA((short)03, sizeOfByteArr,(short)1,fileNamesBytes);
             return ans;
+        }
     }
-}
-
 private Packet LogrqHandle(Packet tmp) {
     System.out.println("Handling LOGRQ");
     String username = ((LOGRQ) tmp).username;

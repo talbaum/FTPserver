@@ -35,7 +35,7 @@ public class DATA extends Packet{
 		byte[] opcodeBytes=shortToBytes(opcode);
 		byte[] blockBytes=ByteBuffer.allocate(2).putShort(blockNum).array();
 		byte[] packetBytes=ByteBuffer.allocate(2).putShort(packetSize).array();
-		byte[] ans=new byte[opcodeBytes.length + packetBytes.length + blockBytes.length + data.length+1];
+		byte[] ans=new byte[opcodeBytes.length + packetBytes.length + blockBytes.length + data.length];
 		
 		for (int i=0;i<opcodeBytes.length;i++){
 			ans[i]=opcodeBytes[i];
