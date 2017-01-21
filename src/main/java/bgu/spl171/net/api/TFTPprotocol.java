@@ -263,12 +263,11 @@ return false;
         // was if(!files.containsKey(fileToWrite))
             if (firstWriteFlag) {
                 firstWriteFlag = false;
-             //   connections.send(ID,checkACK(0, false));
-                isACKfirst= true;
+                // isACKfirst= true;
                 tmp.setFinished();
                 return checkACK(0, false);
             }
-            else {
+            /*else {
                 byte[] myCurData = ((RRQandWRQ) tmp).data;
                 short myCurSize = (short) myCurData.length;
                 DATA fileData = new DATA((short) 03, myCurSize, (short) writeBlockingCount, myCurData);
@@ -283,14 +282,14 @@ return false;
                     firstWriteFlag=true;
                 }
                 isACKfirst= true;
-            }
-        } else
-           // connections.send(ID,getError(5, "")); //file already exist
-           // connections.send(ID,getError(5, "")); //file already exist
-        isACKfirst= false;
-        tmp.setFinished();
+            }*/
+        } else {
+            tmp.setFinished();
+            return getError(5, ""); //file already exist
+        }
         return getError(5, ""); //file already exist
     }
+
     private Packet DataHandle(Packet tmp) {
         System.out.println("Handling data");
         byte[] byteArray= ((RRQandWRQ) tmp).data;
