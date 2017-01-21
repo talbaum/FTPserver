@@ -28,7 +28,7 @@ public class DELRQ extends Packet{
 		for (int i=0;i<filenameBytes.length;i++){
 			ans[i+opcodeBytes.length]=filenameBytes[i];
 		}
-		ans[ans.length-1]=0;
+		ans[ans.length-1]='0';
 		return ans;
 	}
 

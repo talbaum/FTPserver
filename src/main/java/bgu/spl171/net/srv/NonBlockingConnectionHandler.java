@@ -121,8 +121,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     @Override
     public void send(T msg) {
         byte[] ans=encdec.encode(msg);
-        System.out.println(ans.length + " is the length of the ans (ACK 0 length is 5)");
-        System.out.println("Sending in nonblocking...");
         writeQueue.add(ByteBuffer.wrap(ans));
         reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     }

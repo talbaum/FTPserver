@@ -52,10 +52,10 @@ public class Reactor<T> implements Server<T> {
             serverSock.configureBlocking(false);
             serverSock.register(selector, SelectionKey.OP_ACCEPT);
 
-            System.out.println("Trying to connect Man...");
+
             while (!Thread.currentThread().isInterrupted()) {
                 selector.select();
-          //      System.out.println("Operation Recivied!");
+
                 runSelectionThreadTasks();
 
                 for (SelectionKey key : selector.selectedKeys()) {
@@ -73,7 +73,7 @@ public class Reactor<T> implements Server<T> {
             }
 
         } catch (ClosedSelectorException ex) {
-            System.out.println("Server was requested to be closed");  //do nothing - server was requested to be closed
+              //do nothing - server was requested to be closed
         } catch (IOException ex) {
             //this is an error
             ex.printStackTrace();
@@ -98,7 +98,6 @@ public class Reactor<T> implements Server<T> {
 
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
         SocketChannel clientChan = serverChan.accept();
-        System.out.println("Operation Recivied!");
         clientChan.configureBlocking(false);
         final NonBlockingConnectionHandler handler = new NonBlockingConnectionHandler(
                 readerFactory.get(),

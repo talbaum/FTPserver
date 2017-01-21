@@ -15,13 +15,13 @@ public class RRQandWRQ extends Packet {
 		super(opcode);
 		this.byteVec = new Vector<>();
 		this.filename = "";
-		this.data=new byte[512];
+		//this.data=new byte[512];
 	}
 	public RRQandWRQ(short opcode, String filename) {
 		super(opcode);
 		this.byteVec = new Vector<>();
 		this.filename = filename;
-		this.data=new byte[512];
+		//this.data=new byte[512];
 	}
 
 	public RRQandWRQ(short opcode, String filename, DATA packet) {
@@ -42,7 +42,7 @@ public class RRQandWRQ extends Packet {
 		for (int i=0;i<filenameBytes.length;i++) {
 			ans[i+opcodeBytes.length]=filenameBytes[i];
 		}
-		ans[ans.length-1]=0;
+		ans[ans.length-1]='0';
 		return ans;
 	}
 
@@ -59,7 +59,10 @@ public class RRQandWRQ extends Packet {
 			}
 
 			this.filename=new String(myStr,0,myStr.length, StandardCharsets.UTF_8);
-			System.out.println(this.filename);
+
+			this.data=new byte[size-myStr.length];
+			for (int i=0;i<data.length;i++)
+				data[i]=byteVec.elementAt(i+myStr.length);
 
 			setFinished();
 			return this;

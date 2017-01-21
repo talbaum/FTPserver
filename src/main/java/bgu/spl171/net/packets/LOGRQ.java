@@ -45,11 +45,7 @@ public class LOGRQ extends Packet{
 				myStrbytes[i]=byteVec.get(i);
 			}
 			try{
-				System.out.println("decoding username.....");
 				this.username=new String(myStrbytes, "UTF-8");
-				//this.username=new String(myStrbytes);
-
-
 			}
 			catch (Exception e){
 				System.out.println("username problem");

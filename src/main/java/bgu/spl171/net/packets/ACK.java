@@ -12,14 +12,13 @@ public class ACK extends Packet {
 
 	public ACK(short opcode) {
 		super(opcode);
-		//block=0;// make sure
-       // countMyBytesACK=0;//make sure
+
 	}
 
 	public ACK(short opcode, short block) {
 		super(opcode);
 		this.block=block;
-        //countMyBytesACK=0; //make sure
+
 	}
 
 	public byte[] encode(){

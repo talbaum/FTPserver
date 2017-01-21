@@ -10,7 +10,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
 
     @Override
     public Packet decodeNextByte(byte nextByte) {
-        System.out.println("decodeNextByte");
         if(byteCount == 0){
             opArr[0] = nextByte;
             byteCount++;
@@ -20,60 +19,48 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
             opArr[1] = nextByte;
             byteCount++;
             opcode = bytesToShort(opArr);
-            Short s= new Short(opcode);
-
 
             switch (opcode){
                 case((short)0):
-                    System.out.println("opcode 0?");
                     break;
                 case((short)1):{
-                    System.out.println("RRQ Creation");
                     packet = new RRQandWRQ(opcode);
                     break;
                 }
                 case((short)2):{
-                    System.out.println("WRQ Creation");
                     packet = new RRQandWRQ(opcode);
                     break;
                 }
                 case((short)3):{
-                    System.out.println("Data Creation");
+
                     packet = new DATA(opcode);
                     break;
                 }
                 case((short)4):{
-                    System.out.println("ACK Creation");
                     packet = new ACK(opcode);
                     break;
                 }
                 case((short)5):{
-                    System.out.println("Error Creation");
                     packet = new ERROR(opcode);
                     break;
                 }
                 case((short)6): {
-                    System.out.println("Dirq Creation");
                     packet = new DIRQ(opcode);
                     break;
                 }
                 case((short)7):{
-                    System.out.println("Login User Creation");
                     packet = new LOGRQ(opcode);
                     break;
                 }
                 case((short)8):{
-                    System.out.println("Delrq Creation");
                     packet = new DELRQ(opcode);
                     break;
                 }
                 case((short)9):{
-                    System.out.println("BCAST Creation");
                     packet = new BCAST(opcode);
                     break;
                 }
                 case((short)10): {
-                    System.out.println("Discconcet User Creation");
                     packet = new DISC(opcode);
                     break;
                 }
@@ -94,7 +81,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
         if(packet!=null&&packet.isFinished()) {
             Packet ans=packet;
             packet=null;
-            System.out.println(byteCount + " is all the bytes i have in this package");
             byteCount = 0;
             return ans;
         }
@@ -105,7 +91,6 @@ public class EncodeDecodeIMP implements MessageEncoderDecoder<Packet> {
     @Override
     public  byte[] encode(Packet message) {
         short myOp=message.getOpcode();
-        System.out.println(myOp+ " is the encoded opcode (4 is ACK! 7 is LOGRQ!d)");
         switch (myOp){
             case((short)1): return ((RRQandWRQ)message).encode();
             case((short)2): return ((RRQandWRQ)message).encode();

@@ -1,6 +1,7 @@
 package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.*;
+import bgu.spl171.net.packets.Packet;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,7 +36,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
 
             while (connected && (read = in.read()) >= 0) {
                 T nextMessage = encdec.decodeNextByte((byte) read);
-                if (nextMessage != null) {
+                if (nextMessage != null && ((Packet)nextMessage).isFinished()) {
                     protocol.process(nextMessage);
                 }
             }
@@ -56,8 +57,6 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     public void send(T msg) {
         try {
             byte[]tmp=encdec.encode(msg);
-            System.out.println(tmp.length + " is the number of bytes sent");
-            System.out.println("sending in blocking...");
             out.write(tmp);
             out.flush();
         } catch (IOException e) {
