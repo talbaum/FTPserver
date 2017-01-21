@@ -9,9 +9,11 @@ import sun.awt.image.ImageWatched;
 import javax.xml.bind.SchemaOutputResolver;
 import java.io.*;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.APPEND;
@@ -33,7 +35,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     boolean firstWriteFlag=true;
     boolean waitingForWrite=false;
     boolean isACKfirst;
-    boolean firstReadFlag=true;
+    boolean readedData=false;
     boolean moreDataNeeded;
     boolean dataGotAck;
     String fileToWrite;
@@ -96,7 +98,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             }
         }
         System.out.println("finished proccesing, sending messege to client...");
-        if (!isBcast) {
+        if (!isBcast && !readedData) {
             System.out.println(ans.getOpcode() + " is the opcode");
             if (!connections.send(ID, ans)){
                 System.out.println("send command returned false!");
@@ -107,9 +109,14 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             if(shouldTerminate())
                 connections.disconnect(ID);
         }else {
-            connections.broadcast(ans);
-            isBcast = false;
-        }
+            if(isBcast) {
+                connections.broadcast(ans);
+                isBcast = false;
+            }
+            else{
+                readedData=false;
+            }
+            }
     }
 
 
@@ -199,6 +206,8 @@ return false;
         return arr;
     }
 
+
+
     private DATA readHelper(String fileToRead){
         System.out.println("entered read helper");
       if(readBlockingCount==0) {
@@ -233,14 +242,76 @@ return false;
       return null;
     }
 
+    private DATA countAndDivideBytes(File file) {
+        int sizeOfFiles = 512;
+        byte[] buffer = new byte[sizeOfFiles];// buffer for max size of Data
+        BufferedInputStream bis=null;
+        try {
+            bis = new BufferedInputStream(new FileInputStream(file));
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        int tmpSize = 0;
+        int partCounter = 1;
+
+        try {
+            while ((tmpSize = bis.read(buffer)) > 0) {
+                System.out.println(tmpSize + " is the tmpsize");
+                byte[] dataBuffer= Arrays.copyOf(buffer, buffer.length);
+                DATA dataPacket= new DATA((short) 3 ,(short)partCounter,(short)tmpSize, dataBuffer );
+                partCounter++;
+                dataPacket.setFinished();
+                readedData=true;
+                connections.send(ID,dataPacket);
+
+            return dataPacket;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            bis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            }
+    return null;
+    }
+
     private Packet RRQhandle(Packet tmp) {
         System.out.println("Handling RRQ");
-      Packet ans=null;
+        Packet ans = null;
+    LinkedList<DATA> allMyData= new LinkedList<>();
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
-        System.out.println("the requetsed filename is: "+ fileToRead);
-        if (firstReadFlag) {
-            if (searchTheFileInFolder(fileToRead))
-                ans= readHelper(fileToRead);
+        System.out.println("the requetsed filename is: " + fileToRead);
+            if (searchTheFileInFolder(fileToRead)) {
+                File files = new File("Files");
+                String[] dirlist = files.list();
+                for (int i = 0; i < dirlist.length; i++) {
+                    if (dirlist[i].equals(fileToRead)) {
+                        Path filePath = Paths.get("Files", fileToRead);
+                        System.out.println(filePath.toString());
+                        File tempfile = new File(filePath.toString());
+                        System.out.println("kaki 1");
+                   ans=countAndDivideBytes(tempfile);
+                        System.out.println("kaki 2");
+                    }
+            }
+        }
+
+   /*
+                File file=null;
+                File curDir = new File("Files"+ File.separator);
+                File[] filesList = curDir.listFiles();
+                for(File f : filesList) {
+                    if (f.getName().equals(fileToRead)) {
+                        file = f;
+                        break;
+                    }
+                }
+                Path path = Paths.get("Files", ((RRQandWRQ)tmp).getFileName());
+                while()
+                countAndDivideBytes(file);
+            }
             else
                 ans= getError(1, ""); //file not found for reading
 
@@ -257,7 +328,7 @@ return false;
             else{
                 ans= getError(0, ""); //file not found for reading  //didn't got more data. need to return error.
             }
-        }
+        }*/
         return ans;
     }
     private Packet WRQhandle(Packet tmp) {
