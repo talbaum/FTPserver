@@ -91,7 +91,12 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         System.out.println("finished proccesing, sending messege to client...");
         if (!isBcast) {
             System.out.println(ans.getOpcode() + " is the opcode");
-            connections.send(ID, ans);
+            if (!connections.send(ID, ans)){
+                System.out.println("send command returned false!");
+            }
+            else{
+                System.out.println("send command returned true!");
+            }
             if(shouldTerminate())
                 connections.disconnect(ID);
         }else
@@ -205,32 +210,34 @@ return false;
         System.out.println("entered read helper");
       if(readBlockingCount==0) {
           File myReadedFile = new File("Files" + File.separator + fileToRead);
-        LinkedList<byte> allBytes= myReadedFile.g
+        //LinkedList<byte> allBytes= myReadedFile.getAbsoluteFile();
           //not finished
           readBlockingCount++;
       }
       else{
 
       }
-
-        if (files.get(fileToRead).isEmpty()) {
-            System.out.println("is empty ");
-            String letAllKnowRead = fileToRead + " has completed uploading to the server.";
-            connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
-            isBcast = true;
-            readBlockingCount = 0;
-            moreDataNeeded=false;
-            return null;
+        if (files.containsKey(fileToRead)) {
+            if (files.get(fileToRead).isEmpty()) {
+                System.out.println("is empty ");
+                String letAllKnowRead = fileToRead + " has completed uploading to the server.";
+                connections.broadcast(letAllKnowRead.getBytes()); // returns only to the client
+                isBcast = true;
+                readBlockingCount = 0;
+                moreDataNeeded = false;
+                return null;
+            } else {
+                System.out.println("not is empty");
+                byte[] curData = readMaximum512Bytes(fileToRead); //change to good return op code bock
+                short sizeOfData = (short) curData.length;
+                DATA ans = new DATA((short) 03, sizeOfData, (short) readBlockingCount, curData);
+                readBlockingCount++;
+                moreDataNeeded = true;
+                return ans;
+            }
         }
-        else {
-            System.out.println("not is empty");
-            byte[] curData = readMaximum512Bytes(fileToRead); //change to good return op code bock
-            short sizeOfData = (short) curData.length;
-            DATA ans = new DATA((short) 03, sizeOfData, (short) readBlockingCount, curData);
-            readBlockingCount++;
-            moreDataNeeded=true;
-            return ans;
-        }
+        System.out.println("the file is not in database!, returning null!");
+      return null;
     }
 
     private Packet RRQhandle(Packet tmp) {
@@ -245,9 +252,9 @@ return false;
                 ans= getError(1, ""); //file not found for reading
 
             if(ans!=null) //means it's an error. initiliaze this for next read
-                firstReadFlag=false;
-            else
                 firstReadFlag=true;
+            else
+                firstReadFlag=false;
         }
         else{
             if(dataGotAck){
@@ -389,7 +396,7 @@ private Packet LogrqHandle(Packet tmp) {
     private boolean removeFromFilesFolder(String deleteMe) {
         try {
             //check for generic path
-            Path p1 = Paths.get("C:\\Users\\באום\\Desktop\\SPL\\Intelij_Projects\\SPL3\\net\\Files\\" + deleteMe);
+            Path p1 = Paths.get("C:\\Users\\amitu\\Desktop\\spl-net\\Files\\" + deleteMe);
             Files.delete(p1);
             files.remove(deleteMe);
             return true;

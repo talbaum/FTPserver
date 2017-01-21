@@ -29,12 +29,15 @@ public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
 
     @Override
     public boolean send(int connectionId, Object msg) {
+        System.out.println("inside send before containsKey");
         if (MyConnections.containsKey(connectionId)) {
+            System.out.println("is inside send before getting conHan");
             ConnectionHandler<T> tmp= MyConnections.get(connectionId);
             System.out.println(((Packet)msg).isFinished() + " is finished");
             tmp.send((T) msg);
             return true;
         }
+
         return false;
     }
 
