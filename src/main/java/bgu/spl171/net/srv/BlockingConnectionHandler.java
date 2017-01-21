@@ -1,6 +1,8 @@
 package bgu.spl171.net.srv;
 
 import bgu.spl171.net.api.*;
+import bgu.spl171.net.impl.TFTPtcp.ConnectionsImpl;
+import bgu.spl171.net.impl.TFTPtcp.TFTPprotocol;
 import bgu.spl171.net.packets.Packet;
 
 import java.io.BufferedInputStream;

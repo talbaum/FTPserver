@@ -1,15 +1,14 @@
-package bgu.spl171.net.srv;
+package bgu.spl171.net.impl.TFTPtcp;
 
-import bgu.spl171.net.api.ConnectionsImpl;
-import bgu.spl171.net.api.EncodeDecodeIMP;
-import bgu.spl171.net.api.TFTPprotocol;
+import bgu.spl171.net.srv.Reactor;
+import bgu.spl171.net.srv.ThreadPerClient;
 
 import java.io.IOException;
 
 /**
  * Created by baum on 17/01/2017.
  */
-public class Main {
+public class TPCMain {
     public static void main(String[] args) throws IOException {
 
           Reactor r = new Reactor(2, 8888, () -> {
