@@ -35,7 +35,7 @@ public class BCAST extends Packet{
 		for (int i=0;i<filenameBytes.length;i++){
 			ans[opcodeBytes.length+i+1]=filenameBytes[i];
 		}
-		ans[ans.length-1]=0;
+		ans[ans.length-1]='0';
 		return ans;
 	}
 
