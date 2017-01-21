@@ -228,6 +228,8 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     if (dirlist[i].equals(fileToRead)) {
                         Path filePath = Paths.get("Files", fileToRead);
                         File tempfile = new File(filePath.toString());
+                        File emptyFile= new File("Files");
+                        while(tempfile.compareTo(emptyFile)!=0)
                          ans=countAndDivideBytes(tempfile);
                     }
             }
