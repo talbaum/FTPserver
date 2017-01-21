@@ -31,6 +31,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     boolean isBcast = false;
     boolean isLogged;
     boolean firstWriteFlag=true;
+    boolean waitingForWrite=false;
     boolean isACKfirst;
     boolean firstReadFlag=true;
     boolean moreDataNeeded;
@@ -63,6 +64,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
                     break;
                 case 2:
                     ans=WRQhandle(tmp);
+                    waitingForWrite=true;
                     // DATA dataPack = new DATA((short)3,)
                       //  ans = DataHandle(tmp);
 
@@ -104,8 +106,10 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
             }
             if(shouldTerminate())
                 connections.disconnect(ID);
-        }else
+        }else {
+            connections.broadcast(ans);
             isBcast = false;
+        }
     }
 
 
@@ -292,7 +296,7 @@ return false;
 
     private Packet DataHandle(Packet tmp) {
         System.out.println("Handling data");
-        byte[] byteArray= ((RRQandWRQ) tmp).data;
+        byte[] byteArray= ((DATA) tmp).data;
 
 
         for (int i = 0; i < byteArray.length; i++)
@@ -430,7 +434,10 @@ return false;
         String filenameToDel = ((DELRQ) tmp).filename;
         if (searchTheFileInFolder(filenameToDel)) {
             removeFromFilesFolder(filenameToDel);
-            return checkACK(0, false);
+            connections.send(ID,checkACK(0, false));
+            BCAST b = new BCAST((short)9, (byte) 0,filenameToDel);
+            isBcast=true;
+            return b;
         } else
             return getError(1, ""); //cannot read violation
     }
@@ -447,7 +454,7 @@ return false;
 
     private Packet BcastHandle(Packet tmp) {
         System.out.println("Handling BCAST");
-        connections.broadcast(((BCAST) tmp).encode()); //make sure it's ok
+        connections.broadcast(((BCAST) tmp)); //make sure it's ok
         isBcast = true;
         return null;
     }
