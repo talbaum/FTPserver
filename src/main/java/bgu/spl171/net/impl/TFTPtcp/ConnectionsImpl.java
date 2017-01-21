@@ -1,6 +1,6 @@
 package bgu.spl171.net.impl.TFTPtcp;
 
-import bgu.spl171.net.srv.ConnectionHandler;
+import bgu.spl171.net.impl.TFTPtcp.srv.ConnectionHandler;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by amitu on 07/01/2017.
  */
-public class ConnectionsImpl<T> implements bgu.spl171.net.api.Connections<T>{
+public class ConnectionsImpl<T> implements bgu.spl171.net.impl.TFTPtcp.api.Connections<T>{
 
     Integer nextId=0;
     ConcurrentHashMap<Integer ,ConnectionHandler<T>> MyConnections = new ConcurrentHashMap<Integer ,ConnectionHandler<T>>();

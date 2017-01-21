@@ -1,7 +1,7 @@
 package bgu.spl171.net.impl.TFTPtcp;
 
-import bgu.spl171.net.srv.Reactor;
-import bgu.spl171.net.srv.ThreadPerClient;
+import bgu.spl171.net.impl.TFTPtcp.srv.Reactor;
+import bgu.spl171.net.impl.TFTPtcp.srv.ThreadPerClient;
 
 import java.io.IOException;
 

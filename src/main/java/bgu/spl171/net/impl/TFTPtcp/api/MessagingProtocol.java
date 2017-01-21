@@ -1,4 +1,4 @@
-package bgu.spl171.net.api;
+package bgu.spl171.net.impl.TFTPtcp.api;
 
 public interface MessagingProtocol<T> {
  

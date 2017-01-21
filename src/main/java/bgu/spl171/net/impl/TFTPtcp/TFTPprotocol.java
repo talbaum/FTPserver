@@ -1,7 +1,7 @@
 package bgu.spl171.net.impl.TFTPtcp;
-import bgu.spl171.net.api.BidiMessagingProtocol;
-import bgu.spl171.net.api.Connections;
-import bgu.spl171.net.packets.*;
+import bgu.spl171.net.impl.TFTPtcp.api.BidiMessagingProtocol;
+import bgu.spl171.net.impl.TFTPtcp.api.Connections;
+import bgu.spl171.net.impl.TFTPtcp.packets.*;
 
 
 import java.io.*;

@@ -1,7 +1,6 @@
-package bgu.spl171.net.packets;
+package bgu.spl171.net.impl.TFTPtcp.packets;
 
 import java.util.Vector;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Created by baum on 10/01/2017.

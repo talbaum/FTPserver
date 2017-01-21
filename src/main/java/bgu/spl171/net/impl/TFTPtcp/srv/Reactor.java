@@ -1,8 +1,8 @@
-package bgu.spl171.net.srv;
+package bgu.spl171.net.impl.TFTPtcp.srv;
 
-import bgu.spl171.net.api.BidiMessagingProtocol;
+import bgu.spl171.net.impl.TFTPtcp.api.BidiMessagingProtocol;
 import bgu.spl171.net.impl.TFTPtcp.ConnectionsImpl;
-import bgu.spl171.net.api.MessageEncoderDecoder;
+import bgu.spl171.net.impl.TFTPtcp.api.MessageEncoderDecoder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

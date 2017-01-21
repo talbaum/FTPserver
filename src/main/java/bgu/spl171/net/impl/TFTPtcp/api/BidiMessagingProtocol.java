@@ -3,9 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bgu.spl171.net.api;
-
-import java.util.LinkedList;
+package bgu.spl171.net.impl.TFTPtcp.api;
 
 /**
  *

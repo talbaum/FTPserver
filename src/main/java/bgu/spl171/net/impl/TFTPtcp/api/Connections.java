@@ -1,6 +1,4 @@
-package bgu.spl171.net.api;
-
-import java.io.IOException;
+package bgu.spl171.net.impl.TFTPtcp.api;
 
 public interface Connections<T> {
 

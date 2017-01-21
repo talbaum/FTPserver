@@ -1,4 +1,4 @@
-package bgu.spl171.net.packets;
+package bgu.spl171.net.impl.TFTPtcp.packets;
 
 abstract public class Packet{
 	short opcode;
