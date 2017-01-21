@@ -25,6 +25,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     public ConnectionsImpl connections;
     ConcurrentHashMap<String, LinkedList<Byte>> files = new ConcurrentHashMap<>();
     LinkedList<String> loggedUsers= new LinkedList<>();
+    String loggedUsername;
     LinkedList<Byte> singleFileData = new LinkedList<>();
     boolean isBcast = false;
     boolean isLogged;
@@ -41,7 +42,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     public void start(int connectionId, Connections<T> connections) {
         this.connections = (ConnectionsImpl) connections;
         this.ID = connectionId;
-
         this.isLogged = false;
     }
 
@@ -107,13 +107,10 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     @Override
     public boolean shouldTerminate() {
         return !isLogged;
-       // return false;
-    } //need to make sure
+    }
 
     private ACK checkACK(int blockNum, boolean isData) {
-
         System.out.println("Entered Check ACK");
-
         if (!isData){
             ACK ans= new ACK(((short)04), (short) 0);
             ans.setFinished();
@@ -153,20 +150,10 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
     }
 
     private boolean byteToFile(byte[] tmp, String name) {
-        /*Path p = Paths.get("Files"+name);
-        try (OutputStream out = new BufferedOutputStream(
-                Files.newOutputStream(p, CREATE, APPEND))) {
-            out.write(tmp, 0, tmp.length);
-            return true;
-        } catch (IOException x) {
-            System.err.println(x);
-            return false;
-        }*/
         FileOutputStream fos = null;
         File file;
         try {
-            //Specify the file path here
-            file = new File("Files" + File.separator + "name");
+            file = new File("Files" + File.separator + name);
             fos = new FileOutputStream(file);
             if (!file.exists()) {
                 file.createNewFile();
@@ -182,9 +169,7 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         finally {
             try {
                 if (fos != null)
-                {
                     fos.close();
-                }
             }
             catch (IOException ioe) {
                 System.out.println("Error in closing the Stream");
@@ -193,7 +178,6 @@ public class TFTPprotocol<T> implements BidiMessagingProtocol<T> {
         }
 return false;
     }
-
 
     private byte[] readMaximum512Bytes(String readMe) {
         byte[] arr = new byte[512];
@@ -365,8 +349,8 @@ return false;
             for (String nameOfFile : files.keySet()) {
             allFilesNames += nameOfFile + " \0 ";
             }
-
-    if (allFilesNames.equals(""))
+allFilesNames+='0';
+    if (allFilesNames.equals('0'))
         return getError(0, "No Files to show");
     else{
         byte[]fileNamesBytes= allFilesNames.getBytes();
@@ -386,7 +370,8 @@ private Packet LogrqHandle(Packet tmp) {
             if (!connections.MyConnections.contains(ID)) {
                 System.out.println(username + "entered loginHandle");
                 isLogged = true;
-                loggedUsers.add(username);
+                loggedUsername=username;
+                loggedUsers.add(loggedUsername);
                 return checkACK(0, false);
             }
 
@@ -398,8 +383,7 @@ private Packet LogrqHandle(Packet tmp) {
 
     private boolean removeFromFilesFolder(String deleteMe) {
         try {
-            //check for generic path
-            Path p1 = Paths.get("C:\\Users\\amitu\\Desktop\\spl-net\\Files\\" + deleteMe);
+            Path p1 = Paths.get("Files"+ File.separator + deleteMe);
             Files.delete(p1);
             files.remove(deleteMe);
             return true;
@@ -415,19 +399,6 @@ private Packet LogrqHandle(Packet tmp) {
         }
     }
     private boolean searchTheFileInFolder(String findMe){
-     /*   String textPath= "Files";
-        Path path = Paths.get(textPath);
-        try {
-            Stream<Path> allFiles= Files.list(path);
-            Object[] allFilesArr=allFiles.toArray();
-            for(Object file:allFilesArr ){
-               if(((File)file).getName().equals(findMe))
-                   return true;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    return false;*/
         System.out.println("SEARCH THE FILE!!");
         File curDir = new File("Files"+ File.separator);
         File[] filesList = curDir.listFiles();
@@ -462,6 +433,7 @@ return false;
         } else
             return getError(1, ""); //file not found
     }*/
+
     private Packet BcastHandle(Packet tmp) {
         System.out.println("Handling BCAST");
         connections.broadcast(((BCAST) tmp).encode()); //make sure it's ok
@@ -471,7 +443,7 @@ return false;
 
     private ACK DiscHandle(Packet tmp) {
         System.out.println("Handling DISC");
-
+        loggedUsers.remove(loggedUsername);
         isLogged = false;
         return checkACK(0, false);
     }
