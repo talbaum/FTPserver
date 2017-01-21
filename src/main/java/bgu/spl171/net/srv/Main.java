@@ -30,7 +30,6 @@ public class Main {
         //t.serve();
         //t.close();
 */
-      try {
           Reactor r = new Reactor(2, 8888, () -> {
               return new TFTPprotocol();
           }, () -> {
@@ -42,13 +41,10 @@ public class Main {
               return new EncodeDecodeIMP();
           });
 
-          // s.serve();
-          //s.close();
+         //  s.serve();
+         // s.close();
           r.serve();
           r.close();
       }
-      catch (Exception e){
-          System.out.println("Invalid step");
-      }
     }
-}
+

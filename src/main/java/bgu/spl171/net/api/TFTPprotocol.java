@@ -203,6 +203,16 @@ return false;
 
     private DATA readHelper(String fileToRead){
         System.out.println("entered read helper");
+      if(readBlockingCount==0) {
+          File myReadedFile = new File("Files" + File.separator + fileToRead);
+        LinkedList<byte> allBytes= myReadedFile.g
+          //not finished
+          readBlockingCount++;
+      }
+      else{
+
+      }
+
         if (files.get(fileToRead).isEmpty()) {
             System.out.println("is empty ");
             String letAllKnowRead = fileToRead + " has completed uploading to the server.";
@@ -229,7 +239,7 @@ return false;
         String fileToRead = ((RRQandWRQ) tmp).getFileName();
         System.out.println("the requetsed filename is: "+ fileToRead);
         if (firstReadFlag) {
-            if (files.containsKey(fileToRead) || searchTheFileInFolder(fileToRead))
+            if (searchTheFileInFolder(fileToRead))
                 ans= readHelper(fileToRead);
             else
                 ans= getError(1, ""); //file not found for reading
@@ -409,7 +419,7 @@ private Packet LogrqHandle(Packet tmp) {
         }
     return false;*/
         System.out.println("SEARCH THE FILE!!");
-        File curDir = new File("Files");
+        File curDir = new File("Files"+ File.separator);
         File[] filesList = curDir.listFiles();
         for(File f : filesList){
             System.out.println(f.getName());
