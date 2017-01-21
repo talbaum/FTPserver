@@ -379,18 +379,21 @@ return false;
 private Packet LogrqHandle(Packet tmp) {
     System.out.println("Handling LOGRQ");
     String username = ((LOGRQ) tmp).username;
-    if (loggedUsers.contains(username)) {
-        return getError(7, ""); //user already logged in
-    } else {
-       if (!connections.MyConnections.contains(ID)) {
-            System.out.println(username+ "entered loginHandle");
-            isLogged = true;
-            loggedUsers.add(username);
-            return checkACK(0, false);
-       }
+    if (!isLogged) {
+        if (loggedUsers.contains(username)) {
+            return getError(7, ""); //user already logged in
+        } else {
+            if (!connections.MyConnections.contains(ID)) {
+                System.out.println(username + "entered loginHandle");
+                isLogged = true;
+                loggedUsers.add(username);
+                return checkACK(0, false);
+            }
 
-        return getError(0, "");
+            return getError(0, "");
+        }
     }
+    return getError(7, "");
 }
 
     private boolean removeFromFilesFolder(String deleteMe) {
