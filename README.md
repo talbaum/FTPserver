@@ -21,3 +21,5 @@ server to communicate broadcast messages to all users and support for directory 
 It is a binary protocol (non-text-base). The commands are defined by an opcode that describes
 the incoming command. For each command, a different length of data needs to be read
 according to it’s specifications. 
+
+This is ther server side, written in Java.
