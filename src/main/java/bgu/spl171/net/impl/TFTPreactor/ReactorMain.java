@@ -7,9 +7,6 @@ import bgu.spl171.net.impl.srv.ThreadPerClient;
 
 import java.io.IOException;
 
-/**
- * Created by amitu on 21/01/2017.
- */
 public class ReactorMain {
     public static void main(String[] args) throws IOException {
         int port = Integer.parseInt(args[0]);
