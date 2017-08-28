@@ -6,9 +6,7 @@ import bgu.spl171.net.impl.api.Connections;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by amitu on 07/01/2017.
- */
+
 public class ConnectionsImpl<T> implements Connections<T> {
 
     Integer nextId=0;
